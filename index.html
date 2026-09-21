@@ -61,6 +61,7 @@
     .team-list-item:hover { background: #f9f9f9; }
     .team-list-item.expanded { background: #f0f4ff; }
     .team-list-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .team-list-actions { display: flex; gap: 8px; align-items: center; }
     .team-list-toggle { font-size: 0.85rem; color: #1a237e; font-weight: 600; }
     .small { font-size: 0.85rem; color: #666; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #1a237e; color: white; margin-left: 6px; }
@@ -943,6 +944,8 @@
         const teamId = slugify(t.teamName);
         const spent = t.riders.reduce((sum, name) => sum + getRider(name).price, 0);
         const captain = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
+        const safeTeamName = t.teamName.replace(/'/g, "\\'");
+        const isOrganizer = currentUser && currentUser.role === "organizer";
         const div = document.createElement("div");
         div.className = "team-list-item";
         div.id = "team-item-" + teamId;
@@ -953,7 +956,10 @@
               <strong>${t.teamName}</strong>
               <div class="small">${t.riders.length} renners &bull; €${spent.toFixed(1)}m &bull; Kapitein: ${captain}</div>
             </div>
-            <div class="team-list-toggle" id="toggle-${teamId}">Toon team ▼</div>
+            <div class="team-list-actions">
+              ${isOrganizer ? `<button class="danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteTeam('${safeTeamName}')">Verwijder</button>` : ""}
+              <div class="team-list-toggle" id="toggle-${teamId}">Toon team ▼</div>
+            </div>
           </div>
           <div class="team-detail-content hidden" id="detail-${teamId}" onclick="event.stopPropagation()"></div>
         `;
