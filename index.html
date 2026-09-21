@@ -32,10 +32,16 @@
     .rider-card.captain { border-color: #f9a825; background: #fffde7; box-shadow: 0 0 0 2px #f9a825; }
     .rider-name { font-weight: 600; }
     .rider-meta { font-size: 0.85rem; color: #555; margin-top: 4px; }
+    .country-link { color: #1a237e; text-decoration: underline; cursor: pointer; font-weight: 600; }
+    .country-link:hover { color: #0d1642; }
     .captain-btn { position: absolute; top: 8px; right: 8px; font-size: 0.75rem; padding: 4px 8px; background: #f9a825; color: #222; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
     .captain-btn:hover { background: #f57f17; }
-    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: flex-end; }
     .filters input, .filters select { width: auto; flex: 1; min-width: 160px; }
+    .price-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .price-btn { padding: 8px 14px; background: #e0e0e0; color: #222; border: 1px solid #ccc; font-size: 0.9rem; }
+    .price-btn.active { background: #1a237e; color: white; border-color: #1a237e; }
+    .search-hint { font-size: 0.85rem; color: #666; margin-top: 4px; }
     .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
     .summary-box { flex: 1; min-width: 140px; background: #f0f0f0; padding: 12px; border-radius: 6px; text-align: center; }
     .summary-box .value { font-size: 1.4rem; font-weight: 700; }
@@ -60,7 +66,14 @@
     .standings-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
     .standings-row.top { background: #fffde7; font-weight: 600; }
     .team-detail { margin-top: 8px; font-size: 0.85rem; color: #555; width: 100%; }
-    @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } }
+    .team-composition { margin-top: 16px; }
+    .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 8px; }
+    .comp-row.captain { background: #fffde7; }
+    .comp-info { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex: 1; }
+    .comp-remove { background: #c62828; padding: 4px 10px; font-size: 0.8rem; }
+    .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
+    .empty-state { color: #666; font-style: italic; padding: 10px 0; }
+    @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
   </style>
 </head>
 <body>
@@ -107,6 +120,13 @@
               <div class="label">Kapitein</div>
             </div>
           </div>
+
+          <div id="teamComposition" class="team-composition">
+            <h3>Jouw selectie</h3>
+            <div id="teamCompositionList"></div>
+            <div class="comp-total" id="teamCompositionTotal">Totaal besteed: €0,0m</div>
+          </div>
+
           <div id="teamError" class="error hidden"></div>
           <div id="teamSuccess" class="success-msg hidden"></div>
           <label for="teamNameInput">Teamnaam</label>
@@ -117,15 +137,13 @@
         <div class="card">
           <h2>Beschikbare renners</h2>
           <div class="filters">
-            <input type="text" id="searchRider" placeholder="Zoek renner..." oninput="renderRiders()">
+            <div style="flex: 1; min-width: 160px;">
+              <input type="text" id="searchRider" placeholder="Zoek renner..." oninput="renderRiders()">
+              <div class="search-hint">Typ minimaal 3 tekens om te zoeken.</div>
+            </div>
             <select id="filterCountry" onchange="renderRiders()"><option value="">Alle landen</option></select>
-            <select id="sortRiders" onchange="renderRiders()">
-              <option value="price-desc">Prijs: hoog - laag</option>
-              <option value="price-asc">Prijs: laag - hoog</option>
-              <option value="name">Naam</option>
-              <option value="country">Land</option>
-            </select>
           </div>
+          <div class="price-filters" id="priceFilters"></div>
           <div class="grid" id="ridersGrid"></div>
         </div>
       </div>
@@ -179,26 +197,24 @@
 
     // ======================
     // FIREBASE CONFIGURATIE
-    // VERVANG DIT DOOR JE EIGEN FIREBASE-CONFIGURATIE
     // ======================
     const firebaseConfig = {
-  apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
-  authDomain: "wiekslag-wk-poule.firebaseapp.com",
-  projectId: "wiekslag-wk-poule",
-  storageBucket: "wiekslag-wk-poule.firebasestorage.app",
-  messagingSenderId: "732858975680",
-  appId: "1:732858975680:web:0e6f7f660b88ff3ff5b425"
-};
+      apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
+      authDomain: "wiekslag-wk-poule.firebaseapp.com",
+      projectId: "wiekslag-wk-poule",
+      storageBucket: "wiekslag-wk-poule.firebasestorage.app",
+      messagingSenderId: "732858975680",
+      appId: "1:732858975680:web:0e6f7f660b88ff3ff5b425"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     // ======================
     // WACHTWOORDEN
-    // Pas deze gerust aan
     // ======================
     const PASSWORDS = {
-      participant: "Wiekslagwkpoule",
+      participant: "wielerpoule2026",
       organizer: "organisator2026"
     };
 
@@ -215,7 +231,7 @@ const db = getFirestore(app);
     };
 
     // ======================
-    // RENNERSLIJST (193 renners)
+    // RENNERSLIJST
     // ======================
     const riders = [
       { name: "Remco Evenepoel", country: "BEL", price: 20.0 },
@@ -422,7 +438,6 @@ const db = getFirestore(app);
     let unsubscribeTeams = null;
     let unsubscribeResults = null;
 
-    // Helper: rider by name
     function getRider(name) {
       return riders.find(r => r.name === name);
     }
@@ -482,12 +497,12 @@ const db = getFirestore(app);
     // ======================
     function initUI() {
       populateCountryFilter();
+      renderPriceFilters();
       renderRiders();
       renderResultsInputs();
       renderParticipants();
       renderStandings();
 
-      // Restore local team if any
       const saved = localStorage.getItem("myTeamDraft");
       if (saved) {
         try {
@@ -513,6 +528,20 @@ const db = getFirestore(app);
       });
     }
 
+    function renderPriceFilters() {
+      const prices = [...new Set(riders.map(r => r.price))].sort((a, b) => b - a);
+      const container = document.getElementById("priceFilters");
+      container.innerHTML = `<button class="price-btn active" data-price="" onclick="setPriceFilter(this, '')">Alle prijzen</button>`;
+      prices.forEach(p => {
+        const btn = document.createElement("button");
+        btn.className = "price-btn";
+        btn.dataset.price = p;
+        btn.textContent = `€${p.toFixed(1)}m`;
+        btn.onclick = () => setPriceFilter(btn, p);
+        container.appendChild(btn);
+      });
+    }
+
     // ======================
     // TAB SWITCHING
     // ======================
@@ -525,6 +554,21 @@ const db = getFirestore(app);
       if (tabId === "participants") renderParticipants();
       if (tabId === "standings") renderStandings();
       if (tabId === "results") renderResultsInputs();
+    };
+
+    // ======================
+    // FILTERS
+    // ======================
+    window.setPriceFilter = function(btn, price) {
+      document.querySelectorAll(".price-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderRiders();
+    };
+
+    window.setCountryFilter = function(country) {
+      const select = document.getElementById("filterCountry");
+      select.value = country;
+      renderRiders();
     };
 
     // ======================
@@ -549,8 +593,21 @@ const db = getFirestore(app);
       saveDraft();
     };
 
+    window.removeRider = function(name) {
+      const idx = selectedRiders.indexOf(name);
+      if (idx >= 0) {
+        selectedRiders.splice(idx, 1);
+        if (captainIndex === idx) captainIndex = null;
+        else if (captainIndex !== null && captainIndex > idx) captainIndex--;
+      }
+      hideTeamError();
+      updateSummary();
+      renderRiders();
+      saveDraft();
+    };
+
     window.setCaptain = function(name, event) {
-      event.stopPropagation();
+      if (event) event.stopPropagation();
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         captainIndex = idx;
@@ -570,34 +627,83 @@ const db = getFirestore(app);
       const budgetBox = document.getElementById("budgetBox");
       budgetBox.classList.toggle("error", remaining < 0);
       budgetBox.classList.toggle("warning", remaining >= 0 && remaining < 5);
+
+      renderTeamComposition();
+    }
+
+    function renderTeamComposition() {
+      const list = document.getElementById("teamCompositionList");
+      const totalEl = document.getElementById("teamCompositionTotal");
+      if (selectedRiders.length === 0) {
+        list.innerHTML = "<div class='empty-state'>Nog geen renners geselecteerd.</div>";
+        totalEl.textContent = "Totaal besteed: €0,0m";
+        return;
+      }
+
+      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
+      list.innerHTML = "";
+      selectedRiders.forEach((name, idx) => {
+        const rider = getRider(name);
+        const isCaptain = idx === captainIndex;
+        const row = document.createElement("div");
+        row.className = "comp-row" + (isCaptain ? " captain" : "");
+        row.innerHTML = `
+          <div class="comp-info">
+            <span><strong>${rider.name}</strong></span>
+            <span class="small">${rider.country}</span>
+            <span class="small">€${rider.price.toFixed(1)}m</span>
+            ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}
+          </div>
+          <button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>
+        `;
+        list.appendChild(row);
+      });
+      totalEl.textContent = `Totaal besteed: €${spent.toFixed(1)}m`;
     }
 
     function renderRiders() {
-      const search = document.getElementById("searchRider").value.toLowerCase();
+      const searchInput = document.getElementById("searchRider");
+      const search = searchInput.value.toLowerCase().trim();
       const country = document.getElementById("filterCountry").value;
-      const sort = document.getElementById("sortRiders").value;
-
-      let filtered = riders.filter(r => {
-        return r.name.toLowerCase().includes(search) && (country === "" || r.country === country);
-      });
-
-      if (sort === "price-desc") filtered.sort((a, b) => b.price - a.price);
-      else if (sort === "price-asc") filtered.sort((a, b) => a.price - b.price);
-      else if (sort === "name") filtered.sort((a, b) => a.name.localeCompare(b.name));
-      else if (sort === "country") filtered.sort((a, b) => a.country.localeCompare(b.country) || b.price - a.price);
+      const activePriceBtn = document.querySelector(".price-btn.active");
+      const activePrice = activePriceBtn ? activePriceBtn.dataset.price : "";
 
       const grid = document.getElementById("ridersGrid");
       grid.innerHTML = "";
+
+      if (search.length > 0 && search.length < 3) {
+        grid.innerHTML = "<p class='small'>Typ minimaal 3 tekens om te zoeken.</p>";
+        return;
+      }
+
+      let filtered = riders.filter(r => {
+        const matchesSearch = search === "" || r.name.toLowerCase().includes(search);
+        const matchesCountry = country === "" || r.country === country;
+        const matchesPrice = activePrice === "" || r.price === parseFloat(activePrice);
+        return matchesSearch && matchesCountry && matchesPrice;
+      });
+
+      filtered.sort((a, b) => b.price - a.price || a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        grid.innerHTML = "<p class='small'>Geen renners gevonden.</p>";
+        return;
+      }
+
       filtered.forEach(r => {
         const isSelected = selectedRiders.includes(r.name);
         const isCaptain = selectedRiders.indexOf(r.name) === captainIndex;
         const card = document.createElement("div");
         card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "");
         card.onclick = () => window.toggleRider(r.name);
+        const safeName = r.name.replace(/'/g, "\\'");
         card.innerHTML = `
           <div class="rider-name">${r.name}</div>
-          <div class="rider-meta">${r.country} &bull; €${r.price.toFixed(1)}m</div>
-          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${r.name.replace(/'/g, "\\'")}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
+          <div class="rider-meta">
+            <span class="country-link" onclick="event.stopPropagation(); setCountryFilter('${r.country}')">${r.country}</span>
+            &bull; €${r.price.toFixed(1)}m
+          </div>
+          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
         `;
         grid.appendChild(card);
       });
@@ -795,7 +901,6 @@ const db = getFirestore(app);
       let total = 0;
       const riderScores = [];
       team.riders.forEach((name, idx) => {
-        const rider = getRider(name);
         let score = 0;
         for (const [place, riderName] of Object.entries(raceResults)) {
           if (riderName === name) {
@@ -910,7 +1015,6 @@ const db = getFirestore(app);
       }
     };
 
-    // Expose state helpers for debugging
     window._riders = riders;
   </script>
 </body>
