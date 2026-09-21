@@ -57,7 +57,11 @@
     .login-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
     .login-tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
     .login-tab.active { background: #1a237e; color: white; }
-    .team-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 8px; }
+    .team-list-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.15s; }
+    .team-list-item:hover { background: #f9f9f9; }
+    .team-list-item.expanded { background: #f0f4ff; }
+    .team-list-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .team-list-toggle { font-size: 0.85rem; color: #1a237e; font-weight: 600; }
     .small { font-size: 0.85rem; color: #666; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #1a237e; color: white; margin-left: 6px; }
     .export-box { width: 100%; min-height: 120px; font-family: monospace; font-size: 0.85rem; }
@@ -69,6 +73,9 @@
     .standings-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
     .standings-row.top { background: #fffde7; font-weight: 600; }
     .team-detail { margin-top: 8px; font-size: 0.85rem; color: #555; width: 100%; }
+    .team-detail-table { width: 100%; margin-top: 12px; font-size: 0.9rem; }
+    .team-detail-table th, .team-detail-table td { padding: 8px; }
+    .team-detail-table tr.captain { background: #fffde7; font-weight: 600; }
     .team-composition { margin-top: 16px; }
     .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 8px; }
     .comp-row.captain { background: #fffde7; }
@@ -184,6 +191,7 @@
       <div id="participantsTab" class="tab-content hidden">
         <div class="card">
           <h2>Ingediende teams</h2>
+          <p class="small">Klik op een team om de volledige selectie te bekijken.</p>
           <div id="participantsList"></div>
         </div>
       </div>
@@ -226,7 +234,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
@@ -932,21 +940,63 @@
       }
       list.innerHTML = "";
       teams.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "team-list-item";
+        const teamId = slugify(t.teamName);
         const spent = t.riders.reduce((sum, name) => sum + getRider(name).price, 0);
         const captain = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
+        const div = document.createElement("div");
+        div.className = "team-list-item";
+        div.id = "team-item-" + teamId;
+        div.onclick = () => toggleTeamDetail(teamId);
         div.innerHTML = `
-          <div>
-            <strong>${t.teamName}</strong>
-            <div class="team-detail">
-              ${t.riders.length} renners &bull; €${spent.toFixed(1)}m &bull; Kapitein: ${captain}
+          <div class="team-list-header">
+            <div>
+              <strong>${t.teamName}</strong>
+              <div class="small">${t.riders.length} renners &bull; €${spent.toFixed(1)}m &bull; Kapitein: ${captain}</div>
             </div>
+            <div class="team-list-toggle" id="toggle-${teamId}">Toon team ▼</div>
           </div>
-          ${currentUser.role === "organizer" ? `<button class="danger" onclick="deleteTeam('${t.teamName.replace(/'/g, "\\'")}')">Verwijder</button>` : ""}
+          <div class="team-detail-content hidden" id="detail-${teamId}" onclick="event.stopPropagation()"></div>
         `;
         list.appendChild(div);
       });
+    }
+
+    window.toggleTeamDetail = function(teamId) {
+      const detail = document.getElementById("detail-" + teamId);
+      const toggle = document.getElementById("toggle-" + teamId);
+      const item = document.getElementById("team-item-" + teamId);
+      const isHidden = detail.classList.contains("hidden");
+      document.querySelectorAll(".team-detail-content").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".team-list-toggle").forEach(el => el.textContent = "Toon team ▼");
+      document.querySelectorAll(".team-list-item").forEach(el => el.classList.remove("expanded"));
+      if (isHidden) {
+        detail.classList.remove("hidden");
+        toggle.textContent = "Verberg team ▲";
+        item.classList.add("expanded");
+        renderTeamDetail(teamId);
+      }
+    };
+
+    function renderTeamDetail(teamId) {
+      const detail = document.getElementById("detail-" + teamId);
+      const team = Object.values(allTeams).find(t => slugify(t.teamName) === teamId);
+      if (!team) return;
+
+      const spent = team.riders.reduce((sum, name) => sum + getRider(name).price, 0);
+      let html = `<table class="team-detail-table"><thead><tr><th>#</th><th>Renner</th><th>Land</th><th>Prijs</th></tr></thead><tbody>`;
+      team.riders.forEach((name, idx) => {
+        const rider = getRider(name);
+        const isCaptain = idx === team.captainIndex;
+        html += `<tr class="${isCaptain ? 'captain' : ''}">
+          <td>${idx + 1}</td>
+          <td>${rider.name} ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}</td>
+          <td>${rider.country}</td>
+          <td>€${rider.price.toFixed(1)}m</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      html += `<div class="team-detail" style="margin-top: 8px;">Totaal besteed: €${spent.toFixed(1)}m</div>`;
+      detail.innerHTML = html;
     }
 
     window.deleteTeam = async function(teamName) {
