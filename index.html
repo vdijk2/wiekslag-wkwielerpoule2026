@@ -53,7 +53,10 @@
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
     th { background: #f0f0f0; }
-    .login-box { max-width: 400px; margin: 40px auto; }
+    .login-box { max-width: 420px; margin: 40px auto; }
+    .login-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .login-tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+    .login-tab.active { background: #1a237e; color: white; }
     .team-list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 8px; }
     .small { font-size: 0.85rem; color: #666; }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #1a237e; color: white; margin-left: 6px; }
@@ -73,6 +76,7 @@
     .comp-remove { background: #c62828; padding: 4px 10px; font-size: 0.8rem; }
     .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
     .empty-state { color: #666; font-style: italic; padding: 10px 0; }
+    .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
   </style>
 </head>
@@ -84,20 +88,47 @@
 
   <div class="container">
     <div id="loginSection" class="card login-box">
-      <h2>Inloggen</h2>
-      <label for="passwordInput">Wachtwoord</label>
-      <input type="password" id="passwordInput" placeholder="Voer wachtwoord in" onkeydown="if(event.key==='Enter') login()">
-      <button onclick="login()" style="margin-top: 12px; width: 100%;">Inloggen</button>
+      <div class="login-tabs">
+        <button id="loginTabBtn" class="login-tab active" onclick="setLoginMode('login')">Inloggen</button>
+        <button id="registerTabBtn" class="login-tab" onclick="setLoginMode('register')">Registreren</button>
+      </div>
+
+      <div id="loginForm">
+        <h2>Inloggen</h2>
+        <label for="loginName">Jouw naam</label>
+        <input type="text" id="loginName" placeholder="Bijv. Sjoerd">
+        <label for="loginPassword">Wachtwoord</label>
+        <input type="password" id="loginPassword" placeholder="Jouw wachtwoord">
+        <button onclick="login()" style="margin-top: 12px; width: 100%;">Inloggen</button>
+        <div class="small" style="margin-top: 12px;">Organisator? Vul je naam in en het organisatorwachtwoord.</div>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <h2>Registreren</h2>
+        <label for="registerName">Jouw naam</label>
+        <input type="text" id="registerName" placeholder="Bijv. Sjoerd">
+        <label for="registerPassword">Wachtwoord</label>
+        <input type="password" id="registerPassword" placeholder="Kies een wachtwoord">
+        <label for="registerTeamName">Teamnaam</label>
+        <input type="text" id="registerTeamName" placeholder="Bijv. De Koerskoningen">
+        <button onclick="register()" style="margin-top: 12px; width: 100%;">Registreren en team maken</button>
+      </div>
+
+      <div id="loginError" class="error hidden" style="margin-top: 12px;"></div>
     </div>
 
     <div id="appSection" class="hidden">
+      <div class="user-bar">
+        <div>Ingelogd als: <strong id="currentUserName"></strong> <span id="currentUserRole" class="badge"></span></div>
+        <button class="secondary" onclick="logout()">Uitloggen</button>
+      </div>
+
       <div class="tabs">
         <button class="tab active" onclick="showTab('teams', this)">Mijn team</button>
         <button class="tab" onclick="showTab('participants', this)">Deelnemers</button>
         <button class="tab" onclick="showTab('results', this)">Uitslag</button>
         <button class="tab" onclick="showTab('standings', this)">Stand</button>
         <button class="tab" onclick="showTab('data', this)">Backup delen</button>
-        <button class="tab secondary" onclick="logout()">Uitloggen</button>
       </div>
 
       <div id="teamsTab" class="tab-content">
@@ -106,6 +137,7 @@
           <div class="info">
             Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€80,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op.
           </div>
+
           <div class="summary">
             <div class="summary-box" id="budgetBox">
               <div class="value" id="budgetDisplay">80.0</div>
@@ -132,6 +164,7 @@
           <label for="teamNameInput">Teamnaam</label>
           <input type="text" id="teamNameInput" placeholder="Bijv. De Koerskoningen">
           <button onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
+          <button class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
         </div>
 
         <div class="card">
@@ -193,11 +226,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ======================
-    // FIREBASE CONFIGURATIE
-    // ======================
     const firebaseConfig = {
       apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
       authDomain: "wiekslag-wk-poule.firebaseapp.com",
@@ -210,29 +240,16 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ======================
-    // WACHTWOORDEN
-    // ======================
-    const PASSWORDS = {
-      participant: "wiekslagwkpoule",
-      organizer: "organisator2026"
-    };
-
+    const ORGANIZER_PASSWORD = "organisator2026";
     const TOTAL_BUDGET = 80.0;
     const TEAM_SIZE = 10;
 
-    // ======================
-    // PUNTENTABEL
-    // ======================
     const pointsTable = {
       1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
       11: 28, 12: 26, 13: 24, 14: 22, 15: 20, 16: 18, 17: 16, 18: 14, 19: 12, 20: 11,
       21: 10, 22: 9, 23: 8, 24: 7, 25: 6, 26: 5, 27: 4, 28: 3, 29: 2, 30: 1
     };
 
-    // ======================
-    // RENNERSLIJST
-    // ======================
     const riders = [
       { name: "Remco Evenepoel", country: "BEL", price: 20.0 },
       { name: "Isaac Del Toro", country: "MEX", price: 19.0 },
@@ -429,7 +446,6 @@
       { name: "You Li", country: "CHN", price: 2.0 }
     ];
 
-    // State
     let currentUser = null;
     let selectedRiders = [];
     let captainIndex = null;
@@ -442,24 +458,123 @@
       return riders.find(r => r.name === name);
     }
 
-    // ======================
-    // AUTHENTICATIE
-    // ======================
-    window.login = function() {
-      const pw = document.getElementById("passwordInput").value.trim();
-      if (pw === PASSWORDS.participant) {
-        currentUser = { role: "participant" };
-      } else if (pw === PASSWORDS.organizer) {
-        currentUser = { role: "organizer" };
-      } else {
-        alert("Onjuist wachtwoord");
+    async function hashPassword(pw) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(pw);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    window.setLoginMode = function(mode) {
+      document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
+      document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
+      document.getElementById("loginTabBtn").classList.toggle("active", mode === "login");
+      document.getElementById("registerTabBtn").classList.toggle("active", mode === "register");
+      hideLoginError();
+    };
+
+    window.login = async function() {
+      hideLoginError();
+      const name = document.getElementById("loginName").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!name || !password) {
+        showLoginError("Vul naam en wachtwoord in.");
         return;
       }
+
+      if (password === ORGANIZER_PASSWORD) {
+        currentUser = { name, role: "organizer", teamId: null };
+        enterApp();
+        return;
+      }
+
+      const userId = slugify(name);
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+        showLoginError("Onbekende naam of verkeerd wachtwoord.");
+        return;
+      }
+
+      const userData = userDoc.data();
+      const hash = await hashPassword(password);
+      if (hash !== userData.passwordHash) {
+        showLoginError("Onbekende naam of verkeerd wachtwoord.");
+        return;
+      }
+
+      currentUser = { name, role: "participant", teamId: userData.teamId };
+      enterApp();
+    };
+
+    window.register = async function() {
+      hideLoginError();
+      const name = document.getElementById("registerName").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const teamName = document.getElementById("registerTeamName").value.trim();
+
+      if (!name || !password || !teamName) {
+        showLoginError("Vul alle velden in.");
+        return;
+      }
+      if (password === ORGANIZER_PASSWORD) {
+        showLoginError("Kies een ander wachtwoord.");
+        return;
+      }
+      if (password.length < 4) {
+        showLoginError("Wachtwoord moet minimaal 4 tekens bevatten.");
+        return;
+      }
+
+      const userId = slugify(name);
+      const existingUser = await getDoc(doc(db, "users", userId));
+      if (existingUser.exists()) {
+        showLoginError("Deze naam is al in gebruik. Kies een andere naam of log in.");
+        return;
+      }
+
+      const teamId = slugify(teamName);
+      const existingTeam = await getDoc(doc(db, "teams", teamId));
+      if (existingTeam.exists()) {
+        showLoginError("Deze teamnaam is al in gebruik. Kies een andere teamnaam.");
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+      try {
+        await setDoc(doc(db, "teams", teamId), {
+          teamName,
+          riders: [],
+          captainIndex: null,
+          createdAt: new Date().toISOString(),
+          createdBy: name
+        });
+        await setDoc(doc(db, "users", userId), {
+          name,
+          passwordHash,
+          teamId,
+          createdAt: new Date().toISOString()
+        });
+        currentUser = { name, role: "participant", teamId };
+        enterApp();
+      } catch (e) {
+        showLoginError("Fout bij registreren: " + e.message);
+      }
+    };
+
+    function enterApp() {
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("appSection").classList.remove("hidden");
+      document.getElementById("currentUserName").textContent = currentUser.name;
+      document.getElementById("currentUserRole").textContent = currentUser.role === "organizer" ? "Organisator" : "Deelnemer";
       startListeners();
       initUI();
-    };
+    }
 
     window.logout = function() {
       currentUser = null;
@@ -467,14 +582,12 @@
       captainIndex = null;
       document.getElementById("loginSection").classList.remove("hidden");
       document.getElementById("appSection").classList.add("hidden");
-      document.getElementById("passwordInput").value = "";
+      document.getElementById("loginPassword").value = "";
+      document.getElementById("registerPassword").value = "";
       if (unsubscribeTeams) unsubscribeTeams();
       if (unsubscribeResults) unsubscribeResults();
     };
 
-    // ======================
-    // FIREBASE LISTENERS
-    // ======================
     function startListeners() {
       unsubscribeTeams = onSnapshot(collection(db, "teams"), (snapshot) => {
         allTeams = {};
@@ -483,6 +596,9 @@
         });
         renderParticipants();
         renderStandings();
+        if (currentUser.role === "participant" && currentUser.teamId && allTeams[currentUser.teamId]) {
+          loadUserTeam();
+        }
       });
 
       unsubscribeResults = onSnapshot(doc(db, "results", "current"), (docSnap) => {
@@ -492,10 +608,7 @@
       });
     }
 
-    // ======================
-    // UI INITIALISATIE
-    // ======================
-    function initUI() {
+    async function initUI() {
       populateCountryFilter();
       renderPriceFilters();
       renderRiders();
@@ -503,17 +616,23 @@
       renderParticipants();
       renderStandings();
 
-      const saved = localStorage.getItem("myTeamDraft");
-      if (saved) {
-        try {
-          const draft = JSON.parse(saved);
-          document.getElementById("teamNameInput").value = draft.teamName || "";
-          selectedRiders = draft.riders || [];
-          captainIndex = draft.captainIndex !== undefined ? draft.captainIndex : null;
-          updateSummary();
-          renderRiders();
-        } catch (e) {}
+      if (currentUser.role === "participant" && currentUser.teamId) {
+        await loadUserTeam();
+      } else {
+        resetTeamForm();
       }
+    }
+
+    async function loadUserTeam() {
+      if (!currentUser.teamId) return;
+      const teamDoc = await getDoc(doc(db, "teams", currentUser.teamId));
+      if (!teamDoc.exists()) return;
+      const team = teamDoc.data();
+      document.getElementById("teamNameInput").value = team.teamName || "";
+      selectedRiders = [...(team.riders || [])];
+      captainIndex = team.captainIndex !== undefined ? team.captainIndex : null;
+      updateSummary();
+      renderRiders();
     }
 
     function populateCountryFilter() {
@@ -542,9 +661,6 @@
       });
     }
 
-    // ======================
-    // TAB SWITCHING
-    // ======================
     window.showTab = function(tabId, btn) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
       document.getElementById(tabId + "Tab").classList.remove("hidden");
@@ -556,9 +672,6 @@
       if (tabId === "results") renderResultsInputs();
     };
 
-    // ======================
-    // FILTERS
-    // ======================
     window.setPriceFilter = function(btn, price) {
       document.querySelectorAll(".price-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
@@ -571,9 +684,16 @@
       renderRiders();
     };
 
-    // ======================
-    // TEAM SELECTIE
-    // ======================
+    window.resetTeamForm = function() {
+      document.getElementById("teamNameInput").value = "";
+      selectedRiders = [];
+      captainIndex = null;
+      updateSummary();
+      renderRiders();
+      hideTeamError();
+      hideTeamSuccess();
+    };
+
     window.toggleRider = function(name) {
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
@@ -590,7 +710,6 @@
       hideTeamError();
       updateSummary();
       renderRiders();
-      saveDraft();
     };
 
     window.removeRider = function(name) {
@@ -603,7 +722,6 @@
       hideTeamError();
       updateSummary();
       renderRiders();
-      saveDraft();
     };
 
     window.setCaptain = function(name, event) {
@@ -613,7 +731,6 @@
         captainIndex = idx;
         updateSummary();
         renderRiders();
-        saveDraft();
       }
     };
 
@@ -729,6 +846,10 @@
     window.saveTeam = async function() {
       hideTeamError();
       hideTeamSuccess();
+      if (currentUser.role !== "participant" || !currentUser.teamId) {
+        showTeamError("Alleen deelnemers kunnen een team opslaan.");
+        return;
+      }
       const teamName = document.getElementById("teamNameInput").value.trim();
       if (!teamName) {
         showTeamError("Vul een teamnaam in.");
@@ -739,33 +860,48 @@
         showTeamError(errors.join(" "));
         return;
       }
-      const teamData = {
-        teamName,
-        riders: selectedRiders,
-        captainIndex,
-        updatedAt: new Date().toISOString(),
-        updatedBy: currentUser.role
-      };
+
+      const currentTeam = allTeams[currentUser.teamId];
+      if (currentTeam && slugify(currentTeam.teamName) !== slugify(teamName)) {
+        const newTeamId = slugify(teamName);
+        const existing = await getDoc(doc(db, "teams", newTeamId));
+        if (existing.exists()) {
+          showTeamError("Deze teamnaam is al in gebruik.");
+          return;
+        }
+        try {
+          await setDoc(doc(db, "teams", newTeamId), {
+            teamName,
+            riders: selectedRiders,
+            captainIndex,
+            updatedAt: new Date().toISOString(),
+            updatedBy: currentUser.name,
+            createdAt: currentTeam.createdAt || new Date().toISOString(),
+            createdBy: currentTeam.createdBy || currentUser.name
+          });
+          await deleteDoc(doc(db, "teams", currentUser.teamId));
+          await setDoc(doc(db, "users", slugify(currentUser.name)), { teamId: newTeamId }, { merge: true });
+          currentUser.teamId = newTeamId;
+          showTeamSuccess("Team opgeslagen met nieuwe naam!");
+        } catch (e) {
+          showTeamError("Fout bij opslaan: " + e.message);
+        }
+        return;
+      }
+
       try {
-        const teamId = teamName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-        await setDoc(doc(db, "teams", teamId), teamData);
+        await setDoc(doc(db, "teams", currentUser.teamId), {
+          teamName,
+          riders: selectedRiders,
+          captainIndex,
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUser.name
+        }, { merge: true });
         showTeamSuccess("Team opgeslagen!");
-        localStorage.removeItem("myTeamDraft");
       } catch (e) {
         showTeamError("Fout bij opslaan: " + e.message);
       }
     };
-
-    function saveDraft() {
-      const teamName = document.getElementById("teamNameInput").value.trim();
-      localStorage.setItem("myTeamDraft", JSON.stringify({
-        teamName,
-        riders: selectedRiders,
-        captainIndex
-      }));
-    }
-
-    document.getElementById("teamNameInput").addEventListener("input", saveDraft);
 
     function showTeamError(msg) {
       const el = document.getElementById("teamError");
@@ -780,9 +916,13 @@
     }
     function hideTeamSuccess() { document.getElementById("teamSuccess").classList.add("hidden"); }
 
-    // ======================
-    // DEELNEMERS
-    // ======================
+    function showLoginError(msg) {
+      const el = document.getElementById("loginError");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideLoginError() { document.getElementById("loginError").classList.add("hidden"); }
+
     function renderParticipants() {
       const list = document.getElementById("participantsList");
       const teams = Object.values(allTeams).sort((a, b) => a.teamName.localeCompare(b.teamName));
@@ -811,7 +951,7 @@
 
     window.deleteTeam = async function(teamName) {
       if (!confirm(`Team "${teamName}" verwijderen?`)) return;
-      const teamId = teamName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const teamId = slugify(teamName);
       try {
         await deleteDoc(doc(db, "teams", teamId));
       } catch (e) {
@@ -819,9 +959,6 @@
       }
     };
 
-    // ======================
-    // UITSLAG
-    // ======================
     function renderResultsInputs() {
       const container = document.getElementById("resultsInputs");
       container.innerHTML = "";
@@ -894,9 +1031,6 @@
     }
     function hideResultsSuccess() { document.getElementById("resultsSuccess").classList.add("hidden"); }
 
-    // ======================
-    // STAND BEREKENEN
-    // ======================
     function calculateTeamScore(team) {
       let total = 0;
       const riderScores = [];
@@ -977,9 +1111,6 @@
       container.appendChild(table);
     }
 
-    // ======================
-    // BACKUP EXPORT/IMPORT
-    // ======================
     window.exportData = async function() {
       const snapshot = await getDocs(collection(db, "teams"));
       const teams = {};
