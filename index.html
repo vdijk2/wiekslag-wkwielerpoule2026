@@ -661,7 +661,7 @@
       totalEl.textContent = `Totaal besteed: €${spent.toFixed(1)}m`;
     }
 
-    function renderRiders() {
+    window.renderRiders = function() {
       const searchInput = document.getElementById("searchRider");
       const search = searchInput.value.toLowerCase().trim();
       const country = document.getElementById("filterCountry").value;
@@ -707,7 +707,7 @@
         `;
         grid.appendChild(card);
       });
-    }
+    };
 
     function validateTeam() {
       const errors = [];
