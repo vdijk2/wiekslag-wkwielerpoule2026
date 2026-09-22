@@ -47,1257 +47,873 @@
     .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
     .summary-box { flex: 1; min-width: 140px; background: #f0f0f0; padding: 12px; border-radius: 6px; text-align: center; }
     .summary-box .value { font-size: 1.4rem; font-weight: 700; }
-    .summary-box .label { font-size: 0.8rem; color: #555; }
-    .summary-box.warning { background: #fff3e0; }
-    .summary-box.error { background: #ffebee; }
-    .error { color: #c62828; background: #ffebee; padding: 10px; border-radius: 6px; margin: 10px 0; }
-    .success-msg { color: #2e7d32; background: #e8f5e9; padding: 10px; border-radius: 6px; margin: 10px 0; }
+    .summary-box .label { font-size: 0.8rem; color: #666; }
+    .team-list { display: flex; flex-direction: column; gap: 8px; }
+    .team-rider { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f9f9f9; border-radius: 6px; border: 1px solid #eee; }
+    .team-rider.captain { background: #fffde7; border-color: #f9a825; }
+    .team-rider button { padding: 6px 10px; font-size: 0.85rem; }
+    .error { color: #c62828; font-size: 0.9rem; margin-top: 6px; }
+    .success-msg { color: #2e7d32; font-size: 0.9rem; margin-top: 6px; }
+    .login-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .login-bar span { font-weight: 500; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
     th { background: #f0f0f0; }
-    .login-box { max-width: 420px; margin: 40px auto; }
-    .login-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .login-tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
-    .login-tab.active { background: #1a237e; color: white; }
-    .team-list-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.15s; }
-    .team-list-item:hover { background: #f9f9f9; }
-    .team-list-item.expanded { background: #f0f4ff; }
-    .team-list-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .team-list-actions { display: flex; gap: 8px; align-items: center; }
-    .team-list-toggle { font-size: 0.85rem; color: #1a237e; font-weight: 600; }
+    .result-row { display: grid; grid-template-columns: 60px 1fr 100px 120px; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .result-row input, .result-row select { width: 100%; }
+    .deadline-banner { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-weight: 500; text-align: center; }
+    .deadline-banner.locked { background: #f8d7da; color: #721c24; }
     .small { font-size: 0.85rem; color: #666; }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #1a237e; color: white; margin-left: 6px; }
-    .export-box { width: 100%; min-height: 120px; font-family: monospace; font-size: 0.85rem; }
-    .info { background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
-    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
-    .result-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
-    .result-row select { flex: 1; }
-    .result-row span { min-width: 30px; font-weight: 600; }
-    .standings-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-    .standings-row.top { background: #fffde7; font-weight: 600; }
-    .team-detail { margin-top: 8px; font-size: 0.85rem; color: #555; width: 100%; }
-    .team-detail-table { width: 100%; margin-top: 12px; font-size: 0.9rem; }
-    .team-detail-table th, .team-detail-table td { padding: 8px; }
-    .team-detail-table tr.captain { background: #fffde7; font-weight: 600; }
-    .team-composition { margin-top: 16px; }
-    .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 8px; }
-    .comp-row.captain { background: #fffde7; }
-    .comp-info { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex: 1; }
-    .comp-remove { background: #c62828; padding: 4px 10px; font-size: 0.8rem; }
-    .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
-    .empty-state { color: #666; font-style: italic; padding: 10px 0; }
-    .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .deadline-banner { background: #fff3e0; border: 1px solid #f9a825; color: #5d4037; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 500; text-align: center; }
-    .deadline-banner.locked { background: #ffebee; border-color: #c62828; color: #c62828; }
-    @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
+    .rank-1 { color: #b8860b; font-weight: 700; }
+    .rank-2 { color: #757575; font-weight: 700; }
+    .rank-3 { color: #8b4513; font-weight: 700; }
+    @media (max-width: 640px) {
+      .result-row { grid-template-columns: 40px 1fr 70px 90px; }
+      .result-row input, .result-row select { font-size: 0.9rem; padding: 8px; }
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Wiekslag WK Wielerpoule 2026</h1>
-    <p>Mannen Elite Wegrit - Montréal - zondag 27 september 2026</p>
+    <p>Mannen Elite Wegrit - Zondag 27 september 2026</p>
   </header>
 
   <div class="container">
-    <div id="loginSection" class="card login-box">
-      <div class="login-tabs">
-        <button id="loginTabBtn" class="login-tab active" onclick="setLoginMode('login')">Inloggen</button>
-        <button id="registerTabBtn" class="login-tab" onclick="setLoginMode('register')">Registreren</button>
+    <div id="authSection" class="card">
+      <div class="tabs">
+        <button class="tab active" onclick="showAuth('login')">Inloggen</button>
+        <button class="tab" onclick="showAuth('register')">Registreren</button>
       </div>
-
       <div id="loginForm">
-        <h2>Inloggen</h2>
-        <label for="loginName">Jouw naam</label>
-        <input type="text" id="loginName" placeholder="Bijv. Sjoerd">
-        <label for="loginPassword">Wachtwoord</label>
-        <input type="password" id="loginPassword" placeholder="Jouw wachtwoord">
+        <label>Naam</label>
+        <input type="text" id="loginName" placeholder="Je naam">
+        <label>Wachtwoord</label>
+        <input type="password" id="loginPassword" placeholder="Wachtwoord">
         <button onclick="login()" style="margin-top: 12px; width: 100%;">Inloggen</button>
-        <div class="small" style="margin-top: 12px;">Organisator? Vul je naam in en het organisatorwachtwoord.</div>
+        <p class="small">Organisator: willekeurige naam + wachtwoord <code>organisator2026</code></p>
+        <p id="authError" class="error"></p>
       </div>
-
       <div id="registerForm" class="hidden">
-        <h2>Registreren</h2>
-        <label for="registerName">Jouw naam</label>
-        <input type="text" id="registerName" placeholder="Bijv. Sjoerd">
-        <label for="registerPassword">Wachtwoord</label>
-        <input type="password" id="registerPassword" placeholder="Kies een wachtwoord">
-        <label for="registerTeamName">Teamnaam</label>
-        <input type="text" id="registerTeamName" placeholder="Bijv. De Koerskoningen">
-        <button onclick="register()" style="margin-top: 12px; width: 100%;">Registreren en team maken</button>
+        <label>Naam</label>
+        <input type="text" id="regName" placeholder="Je naam">
+        <label>Teamnaam</label>
+        <input type="text" id="regTeam" placeholder="Je teamnaam">
+        <label>Wachtwoord</label>
+        <input type="password" id="regPassword" placeholder="Kies een wachtwoord">
+        <button onclick="register()" style="margin-top: 12px; width: 100%;">Registreren</button>
+        <p id="regError" class="error"></p>
       </div>
-
-      <div id="loginError" class="error hidden" style="margin-top: 12px;"></div>
     </div>
 
     <div id="appSection" class="hidden">
-      <div class="user-bar">
-        <div>Ingelogd als: <strong id="currentUserName"></strong> <span id="currentUserRole" class="badge"></span></div>
+      <div class="login-bar">
+        <span id="userDisplay"></span>
         <button class="secondary" onclick="logout()">Uitloggen</button>
       </div>
 
-      <div id="deadlineBanner" class="deadline-banner hidden"></div>
+      <div id="deadlineBanner" class="deadline-banner"></div>
 
-      <div class="tabs">
-        <button class="tab active" onclick="showTab('teams', this)">Mijn team</button>
-        <button class="tab" onclick="showTab('participants', this)">Deelnemers</button>
-        <button class="tab" onclick="showTab('results', this)">Uitslag</button>
-        <button class="tab" onclick="showTab('standings', this)">Stand</button>
-        <button class="tab" onclick="showTab('data', this)">Backup delen</button>
+      <div class="tabs" id="mainTabs">
+        <button class="tab active" onclick="showTab('selectie')" id="tab-selectie">Selectie</button>
+        <button class="tab" onclick="showTab('deelnemers')" id="tab-deelnemers">Deelnemers</button>
+        <button class="tab hidden" onclick="showTab('uitslag')" id="tab-uitslag">Uitslag</button>
+        <button class="tab" onclick="showTab('stand')" id="tab-stand">Stand</button>
+        <button class="tab" onclick="showTab('regels')" id="tab-regels">Regels</button>
       </div>
 
-      <div id="teamsTab" class="tab-content">
+      <div id="selectie" class="tab-content">
         <div class="card">
-          <h2>Stel je team samen</h2>
-          <div class="info">
-            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) krijgt <strong>10 bonuspunten</strong>.
-          </div>
-
           <div class="summary">
-            <div class="summary-box" id="budgetBox">
-              <div class="value" id="budgetDisplay">90.0</div>
-              <div class="label">Budget over (m)</div>
+            <div class="summary-box">
+              <div class="value" id="budgetUsed">€0,0m</div>
+              <div class="label">Besteed</div>
             </div>
             <div class="summary-box">
-              <div class="value" id="countDisplay">0</div>
+              <div class="value" id="budgetLeft">€90,0m</div>
+              <div class="label">Resterend</div>
+            </div>
+            <div class="summary-box">
+              <div class="value" id="riderCount">0/9</div>
               <div class="label">Renners</div>
             </div>
             <div class="summary-box">
-              <div class="value" id="captainDisplay">-</div>
-              <div class="label">Kapitein</div>
+              <div class="value" id="captainCount">0/1</div>
+              <div class="label">Kopman</div>
             </div>
           </div>
-
-          <div id="teamComposition" class="team-composition">
-            <h3>Jouw selectie</h3>
-            <div id="teamCompositionList"></div>
-            <div class="comp-total" id="teamCompositionTotal">Totaal besteed: €0,0m</div>
-          </div>
-
-          <div id="teamError" class="error hidden"></div>
-          <div id="teamSuccess" class="success-msg hidden"></div>
-          <label for="teamNameInput">Teamnaam</label>
-          <input type="text" id="teamNameInput" placeholder="Bijv. De Koerskoningen">
-          <button id="saveTeamBtn" onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
-          <button id="resetTeamBtn" class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
-        </div>
-
-        <div class="card">
-          <h2>Beschikbare renners</h2>
           <div class="filters">
-            <div style="flex: 1; min-width: 160px;">
-              <input type="text" id="searchRider" placeholder="Zoek renner..." oninput="renderRiders()">
-              <div class="search-hint">Typ minimaal 3 tekens om te zoeken.</div>
-            </div>
-            <select id="filterCountry" onchange="renderRiders()"><option value="">Alle landen</option></select>
+            <input type="text" id="searchInput" placeholder="Zoek renner..." oninput="renderRiders()">
+            <select id="countryFilter" onchange="renderRiders()">
+              <option value="">Alle landen</option>
+            </select>
+            <select id="sortSelect" onchange="renderRiders()">
+              <option value="price-desc">Prijs hoog-laag</option>
+              <option value="price-asc">Prijs laag-hoog</option>
+              <option value="name">Naam A-Z</option>
+              <option value="country">Land A-Z</option>
+            </select>
           </div>
           <div class="price-filters" id="priceFilters"></div>
-          <div class="grid" id="ridersGrid"></div>
+          <div class="search-hint">Tip: gebruik de zoekbalk of klik op een land om te filteren.</div>
+          <div id="riderGrid" class="grid"></div>
+        </div>
+        <div class="card">
+          <h3>Jouw team</h3>
+          <div id="teamList" class="team-list"></div>
+          <button id="saveTeamBtn" onclick="saveTeam()" style="margin-top: 16px; width: 100%;">Team opslaan</button>
+          <p id="teamMsg" class="success-msg"></p>
         </div>
       </div>
 
-      <div id="participantsTab" class="tab-content hidden">
+      <div id="deelnemers" class="tab-content hidden">
         <div class="card">
-          <h2>Ingediende teams</h2>
-          <p class="small">Klik op een team om de volledige selectie te bekijken.</p>
+          <h3>Alle deelnemers</h3>
           <div id="participantsList"></div>
         </div>
       </div>
 
-      <div id="resultsTab" class="tab-content hidden">
+      <div id="uitslag" class="tab-content hidden">
         <div class="card">
-          <h2>Uitslag invoeren</h2>
-          <p class="small">Alleen voor de organisator. Vul de top 30 in. Renners buiten de top 30 of niet gefinisht scoren 0 punten.</p>
-          <div id="resultsError" class="error hidden"></div>
-          <div id="resultsSuccess" class="success-msg hidden"></div>
-          <div id="resultsInputs"></div>
-          <button onclick="saveResults()" style="margin-top: 12px;">Uitslag opslaan</button>
-          <button class="danger" onclick="clearResults()" style="margin-top: 12px; margin-left: 8px;">Uitslag verwijderen</button>
+          <h3>Automatisch resultaten importeren</h3>
+          <p class="small">Kopieer de resultatenlijst van ProCyclingStats en plak deze hieronder. De parser herkent posities, namen en DNF. Klik daarna op "Resultaten parsen". Controleer en pas zo nodig aan, en sla op.</p>
+          <textarea id="pcsResults" rows="10" placeholder="Bijvoorrbeeld:
+1 Mathieu van der Poel Netherlands 6h 15' 12&quot;
+2 Wout van Aert Belgium + 0
+...
+DNF Tom Pidcock Great Britain
+..."></textarea>
+          <div style="display:flex; gap:8px; margin-top: 12px; flex-wrap: wrap;">
+            <button onclick="parsePCSResults()">Resultaten parsen</button>
+            <button class="secondary" onclick="clearResults()">Wis alle resultaten</button>
+          </div>
+          <p id="parseMsg" class="success-msg"></p>
+          <p id="parseError" class="error"></p>
+        </div>
+        <div class="card">
+          <h3>Handmatige uitslag invoer</h3>
+          <div id="resultForm"></div>
+          <button onclick="addResultRow()" class="secondary" style="margin-top: 12px;">Rij toevoegen</button>
+          <button onclick="saveResults()" style="margin-top: 12px; width: 100%;">Uitslag opslaan</button>
+          <p id="resultMsg" class="success-msg"></p>
         </div>
       </div>
 
-      <div id="standingsTab" class="tab-content hidden">
+      <div id="stand" class="tab-content hidden">
         <div class="card">
-          <h2>Stand</h2>
+          <h3>Stand</h3>
           <div id="standingsContent"></div>
         </div>
       </div>
 
-      <div id="dataTab" class="tab-content hidden">
+      <div id="regels" class="tab-content hidden">
         <div class="card">
-          <h2>Backup exporteren</h2>
-          <p class="small">Kopieer deze code en bewaar deze op een veilige plek.</p>
-          <textarea id="exportOutput" class="export-box" readonly></textarea>
-          <button onclick="exportData()" style="margin-top: 8px;">Genereer export</button>
-        </div>
-        <div class="card">
-          <h2>Backup importeren</h2>
-          <p class="small">Plak hier een eerder gegenereerde exportcode.</p>
-          <textarea id="importInput" class="export-box"></textarea>
-          <button onclick="importData()" style="margin-top: 8px;">Importeer</button>
+          <h3>Spelregels</h3>
+          <ul>
+            <li>Samenstellen van een team van <strong>9 renners</strong> binnen een budget van <strong>€90,0 miljoen</strong>.</li>
+            <li>Kies <strong>1 kopman</strong>; punten van de kopman tellen <strong>dubbel</strong>.</li>
+            <li>De selectie sluit op <strong>zondag 27 september 2026 om 15:00 CEST</strong>.</li>
+            <li>Punten klassificatie: 1e = 60, 2e = 50, 3e = 45, 4e = 40, 5e = 35, 6e = 30, 7e = 27, 8e = 24, 9e = 22, 10e = 20, 11e-15e = 15, 16e-20e = 10, 21e-25e = 5, 26e-30e = 3.</li>
+            <li>Renners die <strong>DNF</strong> zijn of buiten de top 30 finishen, krijgen <strong>0 klassificatiepunten</strong>.</li>
+            <li>Landgenotenbonus: elke renner met dezelfde nationaliteit als de winnaar (exclusief de winnaar zelf) die in de top 30 finisht, krijgt <strong>+10 punten</strong>.</li>
+            <li>De totaalscore van een team is de som van alle individuele rennersscores.</li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
+      apiKey: "AIzaSyDkD3_-JZ1vC1l6SN1X0v4_0c2d9F3jG2o",
       authDomain: "wiekslag-wk-poule.firebaseapp.com",
       projectId: "wiekslag-wk-poule",
-      storageBucket: "wiekslag-wk-poule.firebasestorage.app",
-      messagingSenderId: "732858975680",
-      appId: "1:732858975680:web:0e6f7f660b88ff3ff5b425"
+      storageBucket: "wiekslag-wk-poule.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890abcdef"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const ORGANIZER_PASSWORD = "organisator2026";
-    const TOTAL_BUDGET = 90.0;
-    const TEAM_SIZE = 10;
-    const COUNTRYMATE_BONUS = 10;
+    const BUDGET = 90.0;
+    const RIDER_COUNT = 9;
     const DEADLINE = new Date("2026-09-27T15:00:00+02:00");
 
-    const pointsTable = {
-      1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
-      11: 28, 12: 26, 13: 24, 14: 22, 15: 20, 16: 18, 17: 16, 18: 14, 19: 12, 20: 11,
-      21: 10, 22: 9, 23: 8, 24: 7, 25: 6, 26: 5, 27: 4, 28: 3, 29: 2, 30: 1
+    let currentUser = null;
+    let isOrganizer = false;
+    let riders = [];
+    let myTeam = { riders: [], captain: null };
+    let allUsers = [];
+    let results = {};
+    let priceFilter = null;
+
+    const CLASSIFICATION_POINTS = {
+      1: 60, 2: 50, 3: 45, 4: 40, 5: 35, 6: 30, 7: 27, 8: 24, 9: 22, 10: 20,
+      11: 15, 12: 15, 13: 15, 14: 15, 15: 15,
+      16: 10, 17: 10, 18: 10, 19: 10, 20: 10,
+      21: 5, 22: 5, 23: 5, 24: 5, 25: 5,
+      26: 3, 27: 3, 28: 3, 29: 3, 30: 3
     };
 
-    const riders = [
-      { name: "Remco Evenepoel", country: "BEL", price: 20.0 },
-      { name: "Isaac Del Toro", country: "MEX", price: 19.0 },
-      { name: "Paul Seixas", country: "FRA", price: 18.5 },
-      { name: "Mathieu van der Poel", country: "NED", price: 16.0 },
-      { name: "Wout van Aert", country: "BEL", price: 14.5 },
-      { name: "Tom Pidcock", country: "GBR", price: 14.0 },
-      { name: "Giulio Ciccone", country: "ITA", price: 12.5 },
-      { name: "Ben Healy", country: "IRL", price: 11.5 },
-      { name: "Mathias Vacek", country: "CZE", price: 11.5 },
-      { name: "Jhonatan Narvaez", country: "ECU", price: 11.0 },
-      { name: "Brandon McNulty", country: "USA", price: 10.5 },
-      { name: "Quinn Simmons", country: "USA", price: 10.5 },
-      { name: "Giulio Pellizzari", country: "ITA", price: 10.0 },
-      { name: "Mads Pedersen", country: "DEN", price: 10.0 },
-      { name: "Matteo Jorgenson", country: "USA", price: 9.5 },
-      { name: "Richard Carapaz", country: "ECU", price: 9.5 },
-      { name: "Mauro Schmid", country: "SUI", price: 9.0 },
-      { name: "Florian Lipowitz", country: "GER", price: 8.5 },
-      { name: "Juan Ayuso", country: "ESP", price: 8.5 },
-      { name: "Maxim Van Gils", country: "BEL", price: 8.5 },
-      { name: "Christian Scaroni", country: "ITA", price: 8.0 },
-      { name: "Jan Christen", country: "SUI", price: 8.0 },
-      { name: "Adam Yates", country: "GBR", price: 7.5 },
-      { name: "Joao Almeida", country: "POR", price: 7.5 },
-      { name: "Lorenzo Mark Finn", country: "ITA", price: 7.5 },
-      { name: "Primoz Roglic", country: "SLO", price: 7.5 },
-      { name: "Afonso Eulalio", country: "POR", price: 7.0 },
-      { name: "Enric Mas", country: "ESP", price: 7.0 },
-      { name: "Oscar Onley", country: "GBR", price: 7.0 },
-      { name: "Thibau Nys", country: "BEL", price: 7.0 },
-      { name: "Tobias Halland Johannessen", country: "NOR", price: 7.0 },
-      { name: "Toms Skujins", country: "LAT", price: 7.0 },
-      { name: "Felix Gall", country: "AUT", price: 6.5 },
-      { name: "Marc Hirschi", country: "SUI", price: 6.5 },
-      { name: "Michael Matthews", country: "AUS", price: 6.5 },
-      { name: "Mikkel Frolich Honore", country: "DEN", price: 6.5 },
-      { name: "Neilson Powless", country: "USA", price: 6.5 },
-      { name: "Santiago Buitrago", country: "COL", price: 6.5 },
-      { name: "Alberto Bettiol", country: "ITA", price: 6.0 },
-      { name: "Aleksandr Vlasov", country: "AIN", price: 6.0 },
-      { name: "Antonio Morgado", country: "POR", price: 6.0 },
-      { name: "Ben O'Connor", country: "AUS", price: 6.0 },
-      { name: "Michael Storer", country: "AUS", price: 6.0 },
-      { name: "Michael Woods", country: "CAN", price: 6.0 },
-      { name: "Pavel Sivakov", country: "FRA", price: 6.0 },
-      { name: "Alex Baudin", country: "FRA", price: 5.5 },
-      { name: "Andreas Kron", country: "DEN", price: 5.5 },
-      { name: "Attila Valter", country: "HUN", price: 5.5 },
-      { name: "Corbin Strong", country: "NZL", price: 5.5 },
-      { name: "Derek Gee-West", country: "CAN", price: 5.5 },
-      { name: "Jai Hindley", country: "AUS", price: 5.5 },
-      { name: "Matej Mohoric", country: "SLO", price: 5.5 },
-      { name: "Sergio Higuita", country: "COL", price: 5.5 },
-      { name: "Andreas Leknessund", country: "NOR", price: 5.0 },
-      { name: "Felix Engelhardt", country: "GER", price: 5.0 },
-      { name: "Georg Zimmermann", country: "GER", price: 5.0 },
-      { name: "Jefferson Alexander Cepeda", country: "ECU", price: 5.0 },
-      { name: "Jorgen Nordhagen", country: "NOR", price: 5.0 },
-      { name: "Michael Valgren", country: "DEN", price: 5.0 },
-      { name: "Michal Kwiatkowski", country: "POL", price: 5.0 },
-      { name: "Valentin Paret-Peintre", country: "FRA", price: 5.0 },
-      { name: "Anthon Charmig", country: "DEN", price: 4.5 },
-      { name: "Biniam Girmay", country: "ERI", price: 4.5 },
-      { name: "Felix Grossschartner", country: "AUT", price: 4.5 },
-      { name: "Finn Fisher-Black", country: "NZL", price: 4.5 },
-      { name: "Harold Tejada", country: "COL", price: 4.5 },
-      { name: "Igor Arrieta", country: "ESP", price: 4.5 },
-      { name: "Ivan Romeo", country: "ESP", price: 4.5 },
-      { name: "Marco Brenner", country: "GER", price: 4.5 },
-      { name: "Maximilian Schachmann", country: "GER", price: 4.5 },
-      { name: "Orluis Aular", country: "VEN", price: 4.5 },
-      { name: "Quinten Hermans", country: "BEL", price: 4.5 },
-      { name: "Stefan Kung", country: "SUI", price: 4.5 },
-      { name: "Tiesj Benoot", country: "BEL", price: 4.5 },
-      { name: "Victor Langellotti", country: "MON", price: 4.5 },
-      { name: "Alec Segaert", country: "BEL", price: 4.0 },
-      { name: "Bauke Mollema", country: "NED", price: 4.0 },
-      { name: "Carlos Verona", country: "ESP", price: 4.0 },
-      { name: "Darren Rafferty", country: "IRL", price: 4.0 },
-      { name: "Davide Piganzoli", country: "ITA", price: 4.0 },
-      { name: "Fabio Christen", country: "SUI", price: 4.0 },
-      { name: "Fred Wright", country: "GBR", price: 4.0 },
-      { name: "Gal Glivar", country: "SLO", price: 4.0 },
-      { name: "Guillermo Thomas Silva", country: "URU", price: 4.0 },
-      { name: "Kasper Asgreen", country: "DEN", price: 4.0 },
-      { name: "Kevin Vermaerke", country: "USA", price: 4.0 },
-      { name: "Mattia Cattaneo", country: "ITA", price: 4.0 },
-      { name: "Mikkel Bjerg", country: "DEN", price: 4.0 },
-      { name: "Nairo Quintana", country: "COL", price: 4.0 },
-      { name: "Soren Kragh Andersen", country: "DEN", price: 4.0 },
-      { name: "Stefan Bissegger", country: "SUI", price: 4.0 },
-      { name: "Tobias Foss", country: "NOR", price: 4.0 },
-      { name: "Amanuel Ghebreigzabhier", country: "ERI", price: 3.5 },
-      { name: "Artem Shmidt", country: "USA", price: 3.5 },
-      { name: "Ben Oliver", country: "NZL", price: 3.5 },
-      { name: "Brandon Smith Rivera", country: "COL", price: 3.5 },
-      { name: "Bruno Armirail", country: "FRA", price: 3.5 },
-      { name: "Emils Liepins", country: "LAT", price: 3.5 },
-      { name: "Finlay Pickering", country: "GBR", price: 3.5 },
-      { name: "George Bennett", country: "NZL", price: 3.5 },
-      { name: "Gianni Vermeersch", country: "BEL", price: 3.5 },
-      { name: "Henok Mulubrhan", country: "ERI", price: 3.5 },
-      { name: "Hugo Houle", country: "CAN", price: 3.5 },
-      { name: "Jack Haig", country: "AUS", price: 3.5 },
-      { name: "Jakob Soderqvist", country: "SWE", price: 3.5 },
-      { name: "James Shaw", country: "GBR", price: 3.5 },
-      { name: "Jan Tratnik", country: "SLO", price: 3.5 },
-      { name: "Jefferson Alveiro Cepeda", country: "ECU", price: 3.5 },
-      { name: "Jordan Jegat", country: "FRA", price: 3.5 },
-      { name: "Larry Warbasse", country: "USA", price: 3.5 },
-      { name: "Laurence Pithie", country: "NZL", price: 3.5 },
-      { name: "Luka Mezgec", country: "SLO", price: 3.5 },
-      { name: "Madis Mihkels", country: "EST", price: 3.5 },
-      { name: "Mark Donovan", country: "GBR", price: 3.5 },
-      { name: "Matteo Trentin", country: "ITA", price: 3.5 },
-      { name: "Merhawi Kudus", country: "ERI", price: 3.5 },
-      { name: "Michael Leonard", country: "CAN", price: 3.5 },
-      { name: "Natnael Tesfatsion", country: "ERI", price: 3.5 },
-      { name: "Nelson Oliveira", country: "POR", price: 3.5 },
-      { name: "Nicolas Prodhomme", country: "FRA", price: 3.5 },
-      { name: "Patrick Konrad", country: "AUT", price: 3.5 },
-      { name: "Pier-Andre Cote", country: "CAN", price: 3.5 },
-      { name: "Raul Garcia Pierna", country: "ESP", price: 3.5 },
-      { name: "Ryan Mullen", country: "IRL", price: 3.5 },
-      { name: "Sean Quinn", country: "USA", price: 3.5 },
-      { name: "Anders Skaarseth", country: "NOR", price: 3.0 },
-      { name: "Bart Lemmen", country: "NED", price: 3.0 },
-      { name: "Callum Thornley", country: "GBR", price: 3.0 },
-      { name: "Embret Svestad-Bardseng", country: "NOR", price: 3.0 },
-      { name: "Ivo Oliveira", country: "POR", price: 3.0 },
-      { name: "Jakob Omrzel", country: "SLO", price: 3.0 },
-      { name: "Jamie Meehan", country: "IRL", price: 3.0 },
-      { name: "Jordan Labrosse", country: "FRA", price: 3.0 },
-      { name: "Kristians Belohvosciks", country: "LAT", price: 3.0 },
-      { name: "Luke Tuckwell", country: "AUS", price: 3.0 },
-      { name: "Marcel Camprubi", country: "ESP", price: 3.0 },
-      { name: "Markel Beloki", country: "ESP", price: 3.0 },
-      { name: "Martin Svrcek", country: "SVK", price: 3.0 },
-      { name: "Matevz Govekar", country: "SLO", price: 3.0 },
-      { name: "Menno Huising", country: "NED", price: 3.0 },
-      { name: "Nickolas Zukowsky", country: "CAN", price: 3.0 },
-      { name: "Nico Denz", country: "GER", price: 3.0 },
-      { name: "Pavel Novak", country: "CZE", price: 3.0 },
-      { name: "Tim van Dijke", country: "NED", price: 3.0 },
-      { name: "Wilmar Andres Paredes", country: "COL", price: 3.0 },
-      { name: "Andreas Miltiadis", country: "CYP", price: 2.5 },
-      { name: "Anton Kuzmin", country: "KAZ", price: 2.5 },
-      { name: "Arthur Kluckers", country: "LUX", price: 2.5 },
-      { name: "Byron Munton", country: "RSA", price: 2.5 },
-      { name: "Carlos Alfonso Garcia", country: "MEX", price: 2.5 },
-      { name: "Daan Hoole", country: "NED", price: 2.5 },
-      { name: "Daniil Marukhin", country: "KAZ", price: 2.5 },
-      { name: "Eder Frayre", country: "MEX", price: 2.5 },
-      { name: "Eric Antonio Fagundez", country: "URU", price: 2.5 },
-      { name: "Francisco Joel Penuela", country: "VEN", price: 2.5 },
-      { name: "Henrique da Silva Avancini", country: "BRA", price: 2.5 },
-      { name: "Jakub Otruba", country: "CZE", price: 2.5 },
-      { name: "Juan Mardoqueo Vasquez", country: "GUA", price: 2.5 },
-      { name: "Kaden Hopkins", country: "BER", price: 2.5 },
-      { name: "Manuel Rodas", country: "GUA", price: 2.5 },
-      { name: "Mathijs Paasschens", country: "NED", price: 2.5 },
-      { name: "Nadav Raisberg", country: "ISR", price: 2.5 },
-      { name: "Nicholas Narraway", country: "BER", price: 2.5 },
-      { name: "Oussama Abdellah Mimouni", country: "ALG", price: 2.5 },
-      { name: "Pascal Eenkhoorn", country: "NED", price: 2.5 },
-      { name: "Tiago Antunes", country: "POR", price: 2.5 },
-      { name: "Tilen Finkst", country: "SLO", price: 2.5 },
-      { name: "Vicente Rojas", country: "CHI", price: 2.5 },
-      { name: "Alexandre Mayer", country: "MRI", price: 2.0 },
-      { name: "Ali Al Shaikhahmed", country: "KSA", price: 2.0 },
-      { name: "Arno Wallenborn", country: "LUX", price: 2.0 },
-      { name: "Athit Poulard", country: "THA", price: 2.0 },
-      { name: "Christofer Robin Jurado", country: "PAN", price: 2.0 },
-      { name: "Derrick Chavarria", country: "BIZ", price: 2.0 },
-      { name: "Edgar David Cadena", country: "MEX", price: 2.0 },
-      { name: "Fredd Matute", country: "HON", price: 2.0 },
-      { name: "Gil Landim Gomes", country: "GBS", price: 2.0 },
-      { name: "Heorhii Antonenko", country: "UKR", price: 2.0 },
-      { name: "Iustin-Ioan Vaidian", country: "ROU", price: 2.0 },
-      { name: "Jakub Kaczmarek", country: "POL", price: 2.0 },
-      { name: "Jo Hashikawa", country: "JPN", price: 2.0 },
-      { name: "Jose Antonio Escarcega", country: "MEX", price: 2.0 },
-      { name: "Kohath Baron", country: "DMA", price: 2.0 },
-      { name: "Luis Daniel Oses", country: "CRC", price: 2.0 },
-      { name: "Maral-Erdene Batmunkh", country: "MGL", price: 2.0 },
-      { name: "Martins Pluto", country: "LAT", price: 2.0 },
-      { name: "Mateusz Gajdulewicz", country: "POL", price: 2.0 },
-      { name: "Mihajlo Stolic", country: "SRB", price: 2.0 },
-      { name: "Nikiforos Arvanitou", country: "GRE", price: 2.0 },
-      { name: "Piotr Pekala", country: "POL", price: 2.0 },
-      { name: "Samandar Janikulov", country: "UZB", price: 2.0 },
-      { name: "Ulises Alfredo Castillo", country: "MEX", price: 2.0 },
-      { name: "You Li", country: "CHN", price: 2.0 }
+    const COUNTRIES = {
+      "NED": "Nederland", "BEL": "België", "FRA": "Frankrijk", "ITA": "Italië",
+      "ESP": "Spanje", "DEN": "Denemarken", "SLO": "Slovenië", "GBR": "Groot-Brittannië",
+      "AUS": "Australië", "COL": "Colombia", "GER": "Duitsland", "SUI": "Zwitserland",
+      "POR": "Portugal", "AUT": "Oostenrijk", "NOR": "Noorwegen", "POL": "Polen",
+      "USA": "Verenigde Staten", "CAN": "Canada", "IRL": "Ierland", "LUX": "Luxemburg",
+      "KAZ": "Kazachstan", "ECU": "Ecuador", "RSA": "Zuid-Afrika", "NZL": "Nieuw-Zeeland",
+      "SVK": "Slowakije", "CZE": "Tsjechië", "LAT": "Letland", "EST": "Estland"
+    };
+
+    const STARTLIST = [
+      { name: "Mathieu van der Poel", country: "NED", price: 18.0 },
+      { name: "Wout van Aert", country: "BEL", price: 17.5 },
+      { name: "Tadej Pogačar", country: "SLO", price: 17.0 },
+      { name: "Mads Pedersen", country: "DEN", price: 14.0 },
+      { name: "Julian Alaphilippe", country: "FRA", price: 13.5 },
+      { name: "Tom Pidcock", country: "GBR", price: 13.0 },
+      { name: "Biniam Girmay", country: "ERI", price: 12.5 },
+      { name: "Christophe Laporte", country: "FRA", price: 12.0 },
+      { name: "Jasper Philipsen", country: "BEL", price: 11.5 },
+      { name: "Matej Mohorič", country: "SLO", price: 11.0 },
+      { name: "Dylan van Baarle", country: "NED", price: 10.5 },
+      { name: "Søren Kragh Andersen", country: "DEN", price: 10.0 },
+      { name: "Michael Matthews", country: "AUS", price: 9.8 },
+      { name: "Kasper Asgreen", country: "DEN", price: 9.5 },
+      { name: "Florian Sénéchal", country: "FRA", price: 9.2 },
+      { name: "Yves Lampaert", country: "BEL", price: 9.0 },
+      { name: "Gianni Vermeersch", country: "BEL", price: 8.8 },
+      { name: "Stefan Küng", country: "SUI", price: 8.5 },
+      { name: "Nils Politt", country: "GER", price: 8.2 },
+      { name: "Jasper Stuyven", country: "BEL", price: 8.0 },
+      { name: "Mikkel Bjerg", country: "DEN", price: 7.8 },
+      { name: "Tiesj Benoot", country: "BEL", price: 7.5 },
+      { name: "Fred Wright", country: "GBR", price: 7.2 },
+      { name: "Magnus Cort", country: "DEN", price: 7.0 },
+      { name: "Alex Aranburu", country: "ESP", price: 6.8 },
+      { name: "Ben Healy", country: "IRL", price: 6.5 },
+      { name: "Rasmus Tiller", country: "NOR", price: 6.2 },
+      { name: "Pello Bilbao", country: "ESP", price: 6.0 },
+      { name: "Santiago Buitrago", country: "COL", price: 5.8 },
+      { name: "Mark Cavendish", country: "GBR", price: 5.5 },
+      { name: "Tim Merlier", country: "BEL", price: 5.2 },
+      { name: "Danny van Poppel", country: "NED", price: 5.0 },
+      { name: "Mike Teunissen", country: "NED", price: 4.8 },
+      { name: "Olivier Le Gac", country: "FRA", price: 4.5 },
+      { name: "John Degenkolb", country: "GER", price: 4.2 },
+      { name: "Arnaud Démare", country: "FRA", price: 4.0 },
+      { name: "Phil Bauhaus", country: "GER", price: 3.8 },
+      { name: "Davide Ballerini", country: "ITA", price: 3.5 },
+      { name: "Elia Viviani", country: "ITA", price: 3.2 },
+      { name: "Giacomo Nizzolo", country: "ITA", price: 3.0 },
+      { name: "Sam Bennett", country: "IRL", price: 2.8 },
+      { name: "Ryan Mullen", country: "IRL", price: 2.5 },
+      { name: "Lukáš Kubiš", country: "SVK", price: 2.2 },
+      { name: "Emīls Liepiņš", country: "LAT", price: 2.0 },
+      { name: "Norman Vahtra", country: "EST", price: 1.8 },
+      { name: "Aivaras Mikutis", country: "LTU", price: 1.5 },
+      { name: "Dušan Rajović", country: "SRB", price: 1.2 },
+      { name: "Vladimir Miholjević", country: "CRO", price: 1.0 },
+      { name: "Blagosloven Iliev", country: "BUL", price: 0.8 },
+      { name: "Andrej Petrovski", country: "MKD", price: 0.5 }
     ];
 
-    let currentUser = null;
-    let selectedRiders = [];
-    let captainIndex = null;
-    let allTeams = {};
-    let raceResults = {};
-    let unsubscribeTeams = null;
-    let unsubscribeResults = null;
-    let countdownInterval = null;
-
-    function getRider(name) {
-      return riders.find(r => r.name === name);
+    async function sha256(str) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    async function hashPassword(pw) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(pw);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    function normalizeName(name) {
+      return name.toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
     }
 
-    function slugify(text) {
-      return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    function findRiderByName(name) {
+      const norm = normalizeName(name);
+      for (const r of riders) {
+        if (normalizeName(r.name) === norm) return r;
+      }
+      for (const r of riders) {
+        if (normalizeName(r.name).includes(norm) || norm.includes(normalizeName(r.name))) return r;
+      }
+      return null;
     }
 
-    function isDeadlinePassed() {
-      return new Date() >= DEADLINE;
+    function isLocked() {
+      return new Date() > DEADLINE && !isOrganizer;
     }
 
-    function isTeamLocked() {
-      return currentUser && currentUser.role !== "organizer" && isDeadlinePassed();
-    }
-
-    function formatCountdown(ms) {
-      if (ms <= 0) return "0:00:00";
-      const totalSeconds = Math.floor(ms / 1000);
-      const days = Math.floor(totalSeconds / 86400);
-      const hours = Math.floor((totalSeconds % 86400) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      const hh = hours.toString().padStart(2, "0");
-      const mm = minutes.toString().padStart(2, "0");
-      const ss = seconds.toString().padStart(2, "0");
-      if (days > 0) return `${days}d ${hh}:${mm}:${ss}`;
-      return `${hh}:${mm}:${ss}`;
+    function formatDeadline() {
+      return DEADLINE.toLocaleString("nl-NL", { dateStyle: "full", timeStyle: "short" });
     }
 
     function updateDeadlineBanner() {
       const banner = document.getElementById("deadlineBanner");
-      if (!banner) return;
-      const diff = DEADLINE - new Date();
-      banner.classList.remove("hidden");
-
-      if (currentUser && currentUser.role === "organizer") {
-        if (diff <= 0) {
-          banner.classList.add("locked");
-          banner.textContent = "Deadline is verstreken. Jij bent organisator, dus beheerfuncties blijven beschikbaar.";
-        } else {
-          banner.classList.remove("locked");
-          banner.textContent = `Deadline: zondag 27 september 2026 15:00 CEST. Nog ${formatCountdown(diff)}.`;
-        }
-        return;
-      }
-
-      if (diff <= 0) {
+      const now = new Date();
+      if (now > DEADLINE) {
         banner.classList.add("locked");
-        banner.textContent = "De deadline is verstreken. Je kunt je team niet meer aanpassen.";
+        banner.textContent = isOrganizer
+          ? "De deadline is verstreken. Jij kunt als organisator nog wel wijzigingen aanbrengen."
+          : "De deadline is verstreken. Je kunt je team niet meer wijzigen.";
       } else {
+        const diff = DEADLINE - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         banner.classList.remove("locked");
-        banner.textContent = `Deadline: zondag 27 september 2026 15:00 CEST. Nog ${formatCountdown(diff)} om je team aan te passen.`;
+        banner.textContent = `Deadline: ${formatDeadline()} — nog ${days}d ${hours}u ${minutes}m`;
       }
     }
 
-    window.setLoginMode = function(mode) {
-      document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
-      document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
-      document.getElementById("loginTabBtn").classList.toggle("active", mode === "login");
-      document.getElementById("registerTabBtn").classList.toggle("active", mode === "register");
-      hideLoginError();
-    };
-
-    window.login = async function() {
-      hideLoginError();
-      const name = document.getElementById("loginName").value.trim();
-      const password = document.getElementById("loginPassword").value;
-
-      if (!name || !password) {
-        showLoginError("Vul naam en wachtwoord in.");
-        return;
-      }
-
-      if (password === ORGANIZER_PASSWORD) {
-        currentUser = { name, role: "organizer", teamId: null };
-        enterApp();
-        return;
-      }
-
-      const userId = slugify(name);
-      const userDoc = await getDoc(doc(db, "users", userId));
-      if (!userDoc.exists()) {
-        showLoginError("Onbekende naam of verkeerd wachtwoord.");
-        return;
-      }
-
-      const userData = userDoc.data();
-      const hash = await hashPassword(password);
-      if (hash !== userData.passwordHash) {
-        showLoginError("Onbekende naam of verkeerd wachtwoord.");
-        return;
-      }
-
-      currentUser = { name, role: "participant", teamId: userData.teamId };
-      enterApp();
-    };
-
-    window.register = async function() {
-      hideLoginError();
-      const name = document.getElementById("registerName").value.trim();
-      const password = document.getElementById("registerPassword").value;
-      const teamName = document.getElementById("registerTeamName").value.trim();
-
-      if (!name || !password || !teamName) {
-        showLoginError("Vul alle velden in.");
-        return;
-      }
-      if (isDeadlinePassed()) {
-        showLoginError("De deadline is verstreken; registratie is gesloten.");
-        return;
-      }
-      if (password === ORGANIZER_PASSWORD) {
-        showLoginError("Kies een ander wachtwoord.");
-        return;
-      }
-      if (password.length < 4) {
-        showLoginError("Wachtwoord moet minimaal 4 tekens bevatten.");
-        return;
-      }
-
-      const userId = slugify(name);
-      const existingUser = await getDoc(doc(db, "users", userId));
-      if (existingUser.exists()) {
-        showLoginError("Deze naam is al in gebruik. Kies een andere naam of log in.");
-        return;
-      }
-
-      const teamId = slugify(teamName);
-      const existingTeam = await getDoc(doc(db, "teams", teamId));
-      if (existingTeam.exists()) {
-        showLoginError("Deze teamnaam is al in gebruik. Kies een andere teamnaam.");
-        return;
-      }
-
-      const passwordHash = await hashPassword(password);
-      try {
-        await setDoc(doc(db, "teams", teamId), {
-          teamName,
-          riders: [],
-          captainIndex: null,
-          createdAt: new Date().toISOString(),
-          createdBy: name
-        });
-        await setDoc(doc(db, "users", userId), {
-          name,
-          passwordHash,
-          teamId,
-          createdAt: new Date().toISOString()
-        });
-        currentUser = { name, role: "participant", teamId };
-        enterApp();
-      } catch (e) {
-        showLoginError("Fout bij registreren: " + e.message);
-      }
-    };
-
-    function enterApp() {
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("appSection").classList.remove("hidden");
-      document.getElementById("currentUserName").textContent = currentUser.name;
-      document.getElementById("currentUserRole").textContent = currentUser.role === "organizer" ? "Organisator" : "Deelnemer";
-      updateDeadlineBanner();
-      if (countdownInterval) clearInterval(countdownInterval);
-      countdownInterval = setInterval(updateDeadlineBanner, 1000);
-      startListeners();
-      initUI();
-    }
-
-    window.logout = function() {
-      currentUser = null;
-      selectedRiders = [];
-      captainIndex = null;
-      document.getElementById("loginSection").classList.remove("hidden");
-      document.getElementById("appSection").classList.add("hidden");
-      document.getElementById("loginPassword").value = "";
-      document.getElementById("registerPassword").value = "";
-      if (countdownInterval) clearInterval(countdownInterval);
-      if (unsubscribeTeams) unsubscribeTeams();
-      if (unsubscribeResults) unsubscribeResults();
-    };
-
-    function startListeners() {
-      unsubscribeTeams = onSnapshot(collection(db, "teams"), (snapshot) => {
-        allTeams = {};
-        snapshot.forEach(doc => {
-          allTeams[doc.id] = doc.data();
-        });
-        renderParticipants();
-        renderStandings();
-        if (currentUser.role === "participant" && currentUser.teamId && allTeams[currentUser.teamId]) {
-          loadUserTeam();
+    async function initRiders() {
+      const snap = await getDocs(collection(db, "riders"));
+      if (snap.empty) {
+        for (const r of STARTLIST) {
+          await setDoc(doc(db, "riders", normalizeName(r.name)), r);
         }
-      });
-
-      unsubscribeResults = onSnapshot(doc(db, "results", "current"), (docSnap) => {
-        raceResults = docSnap.exists() ? docSnap.data() : {};
-        renderResultsInputs();
-        renderStandings();
-      });
-    }
-
-    async function initUI() {
+        riders = [...STARTLIST];
+      } else {
+        riders = snap.docs.map(d => d.data());
+      }
       populateCountryFilter();
       renderPriceFilters();
-      renderRiders();
-      renderResultsInputs();
-      renderParticipants();
-      renderStandings();
-
-      if (currentUser.role === "participant" && currentUser.teamId) {
-        await loadUserTeam();
-      } else {
-        resetTeamForm();
-      }
-    }
-
-    async function loadUserTeam() {
-      if (!currentUser.teamId) return;
-      const teamDoc = await getDoc(doc(db, "teams", currentUser.teamId));
-      if (!teamDoc.exists()) return;
-      const team = teamDoc.data();
-      document.getElementById("teamNameInput").value = team.teamName || "";
-      selectedRiders = [...(team.riders || [])];
-      captainIndex = team.captainIndex !== undefined ? team.captainIndex : null;
-      updateSummary();
       renderRiders();
     }
 
     function populateCountryFilter() {
+      const sel = document.getElementById("countryFilter");
       const countries = [...new Set(riders.map(r => r.country))].sort();
-      const select = document.getElementById("filterCountry");
-      select.innerHTML = '<option value="">Alle landen</option>';
-      countries.forEach(c => {
-        const option = document.createElement("option");
-        option.value = c;
-        option.textContent = c;
-        select.appendChild(option);
-      });
+      for (const c of countries) {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = COUNTRIES[c] || c;
+        sel.appendChild(opt);
+      }
     }
 
     function renderPriceFilters() {
-      const prices = [...new Set(riders.map(r => r.price))].sort((a, b) => b - a);
+      const ranges = [
+        { label: "Alle", min: 0, max: 999 },
+        { label: "€15m+", min: 15, max: 999 },
+        { label: "€10-15m", min: 10, max: 15 },
+        { label: "€5-10m", min: 5, max: 10 },
+        { label: "€0-5m", min: 0, max: 5 }
+      ];
       const container = document.getElementById("priceFilters");
-      container.innerHTML = `<button class="price-btn active" data-price="" onclick="setPriceFilter(this, '')">Alle prijzen</button>`;
-      prices.forEach(p => {
+      container.innerHTML = "";
+      for (const r of ranges) {
         const btn = document.createElement("button");
-        btn.className = "price-btn";
-        btn.dataset.price = p;
-        btn.textContent = `€${p.toFixed(1)}m`;
-        btn.onclick = () => setPriceFilter(btn, p);
+        btn.className = "price-btn" + (priceFilter === r.label ? " active" : "");
+        btn.textContent = r.label;
+        btn.onclick = () => {
+          priceFilter = priceFilter === r.label ? null : r.label;
+          renderPriceFilters();
+          renderRiders();
+        };
         container.appendChild(btn);
+      }
+    }
+
+    function renderRiders() {
+      const search = normalizeName(document.getElementById("searchInput").value);
+      const country = document.getElementById("countryFilter").value;
+      const sort = document.getElementById("sortSelect").value;
+      const ranges = {
+        "Alle": [0, 999], "€15m+": [15, 999], "€10-15m": [10, 15], "€5-10m": [5, 10], "€0-5m": [0, 5]
+      };
+      const [pMin, pMax] = priceFilter ? ranges[priceFilter] : [0, 999];
+
+      let list = riders.filter(r => {
+        const matchName = normalizeName(r.name).includes(search);
+        const matchCountry = !country || r.country === country;
+        const matchPrice = r.price >= pMin && r.price <= pMax;
+        return matchName && matchCountry && matchPrice;
       });
-    }
 
-    window.showTab = function(tabId, btn) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
-      document.getElementById(tabId + "Tab").classList.remove("hidden");
-      document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
-      btn.classList.add("active");
-
-      if (tabId === "participants") renderParticipants();
-      if (tabId === "standings") renderStandings();
-      if (tabId === "results") renderResultsInputs();
-    };
-
-    window.setPriceFilter = function(btn, price) {
-      document.querySelectorAll(".price-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderRiders();
-    };
-
-    window.setCountryFilter = function(country) {
-      const select = document.getElementById("filterCountry");
-      select.value = country;
-      renderRiders();
-    };
-
-    function updateLockState() {
-      const locked = isTeamLocked();
-      document.getElementById("teamNameInput").disabled = locked;
-      document.getElementById("saveTeamBtn").disabled = locked;
-      document.getElementById("resetTeamBtn").disabled = locked;
-    }
-
-    window.resetTeamForm = function() {
-      if (isTeamLocked()) return;
-      document.getElementById("teamNameInput").value = "";
-      selectedRiders = [];
-      captainIndex = null;
-      updateSummary();
-      renderRiders();
-      hideTeamError();
-      hideTeamSuccess();
-    };
-
-    window.toggleRider = function(name) {
-      if (isTeamLocked()) return;
-      const idx = selectedRiders.indexOf(name);
-      if (idx >= 0) {
-        selectedRiders.splice(idx, 1);
-        if (captainIndex === idx) captainIndex = null;
-        else if (captainIndex !== null && captainIndex > idx) captainIndex--;
-      } else {
-        if (selectedRiders.length >= TEAM_SIZE) {
-          showTeamError("Je mag maximaal 10 renners selecteren.");
-          return;
-        }
-        selectedRiders.push(name);
-      }
-      hideTeamError();
-      updateSummary();
-      renderRiders();
-    };
-
-    window.removeRider = function(name) {
-      if (isTeamLocked()) return;
-      const idx = selectedRiders.indexOf(name);
-      if (idx >= 0) {
-        selectedRiders.splice(idx, 1);
-        if (captainIndex === idx) captainIndex = null;
-        else if (captainIndex !== null && captainIndex > idx) captainIndex--;
-      }
-      hideTeamError();
-      updateSummary();
-      renderRiders();
-    };
-
-    window.setCaptain = function(name, event) {
-      if (isTeamLocked()) return;
-      if (event) event.stopPropagation();
-      const idx = selectedRiders.indexOf(name);
-      if (idx >= 0) {
-        captainIndex = idx;
-        updateSummary();
-        renderRiders();
-      }
-    };
-
-    function updateSummary() {
-      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
-      const remaining = TOTAL_BUDGET - spent;
-      document.getElementById("budgetDisplay").textContent = remaining.toFixed(1);
-      document.getElementById("countDisplay").textContent = selectedRiders.length;
-      document.getElementById("captainDisplay").textContent = captainIndex !== null ? selectedRiders[captainIndex].split(" ").pop() : "-";
-
-      const budgetBox = document.getElementById("budgetBox");
-      budgetBox.classList.toggle("error", remaining < 0);
-      budgetBox.classList.toggle("warning", remaining >= 0 && remaining < 5);
-
-      renderTeamComposition();
-      updateLockState();
-    }
-
-    function renderTeamComposition() {
-      const list = document.getElementById("teamCompositionList");
-      const totalEl = document.getElementById("teamCompositionTotal");
-      const locked = isTeamLocked();
-      if (selectedRiders.length === 0) {
-        list.innerHTML = "<div class='empty-state'>Nog geen renners geselecteerd.</div>";
-        totalEl.textContent = "Totaal besteed: €0,0m";
-        return;
-      }
-
-      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
-      list.innerHTML = "";
-      selectedRiders.forEach((name, idx) => {
-        const rider = getRider(name);
-        const isCaptain = idx === captainIndex;
-        const row = document.createElement("div");
-        row.className = "comp-row" + (isCaptain ? " captain" : "");
-        row.innerHTML = `
-          <div class="comp-info">
-            <span><strong>${rider.name}</strong></span>
-            <span class="small">${rider.country}</span>
-            <span class="small">€${rider.price.toFixed(1)}m</span>
-            ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}
-          </div>
-          ${!locked ? `<button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>` : ""}
-        `;
-        list.appendChild(row);
+      list.sort((a, b) => {
+        if (sort === "price-desc") return b.price - a.price;
+        if (sort === "price-asc") return a.price - b.price;
+        if (sort === "name") return a.name.localeCompare(b.name);
+        if (sort === "country") return a.country.localeCompare(b.country);
+        return 0;
       });
-      totalEl.textContent = `Totaal besteed: €${spent.toFixed(1)}m`;
-    }
 
-    window.renderRiders = function() {
-      const searchInput = document.getElementById("searchRider");
-      const search = searchInput.value.toLowerCase().trim();
-      const country = document.getElementById("filterCountry").value;
-      const activePriceBtn = document.querySelector(".price-btn.active");
-      const activePrice = activePriceBtn ? activePriceBtn.dataset.price : "";
-      const locked = isTeamLocked();
-
-      const grid = document.getElementById("ridersGrid");
+      const grid = document.getElementById("riderGrid");
       grid.innerHTML = "";
-
-      if (search.length > 0 && search.length < 3) {
-        grid.innerHTML = "<p class='small'>Typ minimaal 3 tekens om te zoeken.</p>";
-        return;
-      }
-
-      let filtered = riders.filter(r => {
-        const matchesSearch = search === "" || r.name.toLowerCase().includes(search);
-        const matchesCountry = country === "" || r.country === country;
-        const matchesPrice = activePrice === "" || r.price === parseFloat(activePrice);
-        return matchesSearch && matchesCountry && matchesPrice;
-      });
-
-      filtered.sort((a, b) => b.price - a.price || a.name.localeCompare(b.name));
-
-      if (filtered.length === 0) {
-        grid.innerHTML = "<p class='small'>Geen renners gevonden.</p>";
-        return;
-      }
-
-      filtered.forEach(r => {
-        const isSelected = selectedRiders.includes(r.name);
-        const isCaptain = selectedRiders.indexOf(r.name) === captainIndex;
+      for (const r of list) {
+        const selected = myTeam.riders.includes(r.name);
+        const isCaptain = myTeam.captain === r.name;
         const card = document.createElement("div");
-        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "") + (locked ? " locked" : "");
-        if (!locked) card.onclick = () => window.toggleRider(r.name);
-        const safeName = r.name.replace(/'/g, "\\'");
+        card.className = "rider-card" + (selected ? " selected" : "") + (isCaptain ? " captain" : "") + (isLocked() ? " locked" : "");
         card.innerHTML = `
           <div class="rider-name">${r.name}</div>
           <div class="rider-meta">
-            <span class="country-link" onclick="event.stopPropagation(); setCountryFilter('${r.country}')">${r.country}</span>
-            &bull; €${r.price.toFixed(1)}m
+            <span class="country-link" onclick="event.stopPropagation(); filterCountry('${r.country}')">${COUNTRIES[r.country] || r.country}</span> · €${r.price.toFixed(1)}m
           </div>
-          ${isSelected && !locked ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
+          ${selected ? `<button class="captain-btn" onclick="event.stopPropagation(); toggleCaptain('${r.name}')">${isCaptain ? "Kopman" : "Maak kopman"}</button>` : ""}
         `;
+        card.onclick = () => { if (!isLocked()) toggleRider(r.name); };
         grid.appendChild(card);
-      });
-    };
-
-    function validateTeam() {
-      const errors = [];
-      if (selectedRiders.length !== TEAM_SIZE) errors.push(`Selecteer precies ${TEAM_SIZE} renners.`);
-      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
-      if (spent > TOTAL_BUDGET) errors.push(`Budget overschreden: €${spent.toFixed(1)}m van €${TOTAL_BUDGET.toFixed(1)}m.`);
-      if (captainIndex === null) errors.push("Wijs 1 kapitein aan.");
-      const counts = {};
-      selectedRiders.forEach(name => {
-        const c = getRider(name).country;
-        counts[c] = (counts[c] || 0) + 1;
-      });
-      for (const [c, n] of Object.entries(counts)) {
-        if (n > 2) errors.push(`Meer dan 2 renners uit ${c}.`);
       }
-      return errors;
     }
 
-    window.saveTeam = async function() {
-      hideTeamError();
-      hideTeamSuccess();
-      if (isTeamLocked()) {
-        showTeamError("De deadline is verstreken; je kunt je team niet meer aanpassen.");
-        return;
-      }
-      if (currentUser.role !== "participant" || !currentUser.teamId) {
-        showTeamError("Alleen deelnemers kunnen een team opslaan.");
-        return;
-      }
-      const teamName = document.getElementById("teamNameInput").value.trim();
-      if (!teamName) {
-        showTeamError("Vul een teamnaam in.");
-        return;
-      }
-      const errors = validateTeam();
-      if (errors.length > 0) {
-        showTeamError(errors.join(" "));
-        return;
-      }
+    function filterCountry(code) {
+      document.getElementById("countryFilter").value = code;
+      renderRiders();
+    }
 
-      const currentTeam = allTeams[currentUser.teamId];
-      if (currentTeam && slugify(currentTeam.teamName) !== slugify(teamName)) {
-        const newTeamId = slugify(teamName);
-        const existing = await getDoc(doc(db, "teams", newTeamId));
-        if (existing.exists()) {
-          showTeamError("Deze teamnaam is al in gebruik.");
+    function toggleRider(name) {
+      if (isLocked()) return;
+      const r = riders.find(x => x.name === name);
+      if (myTeam.riders.includes(name)) {
+        myTeam.riders = myTeam.riders.filter(x => x !== name);
+        if (myTeam.captain === name) myTeam.captain = null;
+      } else {
+        if (myTeam.riders.length >= RIDER_COUNT) {
+          alert("Je kunt maximaal " + RIDER_COUNT + " renners selecteren.");
           return;
         }
-        try {
-          await setDoc(doc(db, "teams", newTeamId), {
-            teamName,
-            riders: selectedRiders,
-            captainIndex,
-            updatedAt: new Date().toISOString(),
-            updatedBy: currentUser.name,
-            createdAt: currentTeam.createdAt || new Date().toISOString(),
-            createdBy: currentTeam.createdBy || currentUser.name
-          });
-          await deleteDoc(doc(db, "teams", currentUser.teamId));
-          await setDoc(doc(db, "users", slugify(currentUser.name)), { teamId: newTeamId }, { merge: true });
-          currentUser.teamId = newTeamId;
-          showTeamSuccess("Team opgeslagen met nieuwe naam!");
-        } catch (e) {
-          showTeamError("Fout bij opslaan: " + e.message);
+        const cost = riders.filter(x => myTeam.riders.includes(x.name)).reduce((a, b) => a + b.price, 0) + r.price;
+        if (cost > BUDGET) {
+          alert("Dit past niet binnen het budget.");
+          return;
         }
+        myTeam.riders.push(name);
+      }
+      updateSummary();
+      renderRiders();
+      renderTeam();
+    }
+
+    function toggleCaptain(name) {
+      if (isLocked()) return;
+      if (!myTeam.riders.includes(name)) return;
+      myTeam.captain = myTeam.captain === name ? null : name;
+      renderRiders();
+      renderTeam();
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const cost = riders.filter(r => myTeam.riders.includes(r.name)).reduce((a, b) => a + b.price, 0);
+      document.getElementById("budgetUsed").textContent = "€" + cost.toFixed(1) + "m";
+      document.getElementById("budgetLeft").textContent = "€" + (BUDGET - cost).toFixed(1) + "m";
+      document.getElementById("riderCount").textContent = myTeam.riders.length + "/" + RIDER_COUNT;
+      document.getElementById("captainCount").textContent = (myTeam.captain ? "1" : "0") + "/1";
+    }
+
+    function renderTeam() {
+      const list = document.getElementById("teamList");
+      list.innerHTML = "";
+      if (myTeam.riders.length === 0) {
+        list.innerHTML = "<p class='small'>Nog geen renners geselecteerd.</p>";
+        return;
+      }
+      for (const name of myTeam.riders) {
+        const r = riders.find(x => x.name === name);
+        const isCaptain = myTeam.captain === name;
+        const row = document.createElement("div");
+        row.className = "team-rider" + (isCaptain ? " captain" : "");
+        row.innerHTML = `
+          <div>
+            <strong>${r.name}</strong> ${isCaptain ? "⭐" : ""}<br>
+            <span class="small">${COUNTRIES[r.country] || r.country} · €${r.price.toFixed(1)}m</span>
+          </div>
+          ${!isLocked() ? `<button class="danger" onclick="toggleRider('${r.name}')">Verwijder</button>` : ""}
+        `;
+        list.appendChild(row);
+      }
+      document.getElementById("saveTeamBtn").disabled = isLocked();
+    }
+
+    async function saveTeam() {
+      if (isLocked()) return;
+      if (myTeam.riders.length !== RIDER_COUNT) {
+        alert("Selecteer precies " + RIDER_COUNT + " renners.");
+        return;
+      }
+      if (!myTeam.captain) {
+        alert("Kies een kopman.");
+        return;
+      }
+      await setDoc(doc(db, "teams", currentUser.name), {
+        name: currentUser.name,
+        teamname: currentUser.teamname || "",
+        riders: myTeam.riders,
+        captain: myTeam.captain,
+        updatedAt: new Date().toISOString()
+      });
+      document.getElementById("teamMsg").textContent = "Team opgeslagen!";
+      setTimeout(() => document.getElementById("teamMsg").textContent = "", 3000);
+    }
+
+    async function login() {
+      const name = document.getElementById("loginName").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const error = document.getElementById("authError");
+      error.textContent = "";
+
+      if (!name || !password) {
+        error.textContent = "Vul naam en wachtwoord in.";
         return;
       }
 
-      try {
-        await setDoc(doc(db, "teams", currentUser.teamId), {
-          teamName,
-          riders: selectedRiders,
-          captainIndex,
-          updatedAt: new Date().toISOString(),
-          updatedBy: currentUser.name
-        }, { merge: true });
-        showTeamSuccess("Team opgeslagen!");
-      } catch (e) {
-        showTeamError("Fout bij opslaan: " + e.message);
+      if (password === "organisator2026") {
+        currentUser = { name: name, teamname: "" };
+        isOrganizer = true;
+        enterApp();
+        return;
       }
-    };
 
-    function showTeamError(msg) {
-      const el = document.getElementById("teamError");
-      el.textContent = msg;
-      el.classList.remove("hidden");
+      const ref = doc(db, "users", name);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        error.textContent = "Onbekende gebruiker.";
+        return;
+      }
+      const data = snap.data();
+      const hash = await sha256(password);
+      if (data.passwordHash !== hash) {
+        error.textContent = "Onjuist wachtwoord.";
+        return;
+      }
+      currentUser = { name: data.name, teamname: data.teamname || "" };
+      isOrganizer = false;
+      enterApp();
     }
-    function hideTeamError() { document.getElementById("teamError").classList.add("hidden"); }
-    function showTeamSuccess(msg) {
-      const el = document.getElementById("teamSuccess");
-      el.textContent = msg;
-      el.classList.remove("hidden");
-    }
-    function hideTeamSuccess() { document.getElementById("teamSuccess").classList.add("hidden"); }
 
-    function showLoginError(msg) {
-      const el = document.getElementById("loginError");
-      el.textContent = msg;
-      el.classList.remove("hidden");
+    async function register() {
+      const name = document.getElementById("regName").value.trim();
+      const teamname = document.getElementById("regTeam").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const error = document.getElementById("regError");
+      error.textContent = "";
+
+      if (!name || !teamname || !password) {
+        error.textContent = "Vul alle velden in.";
+        return;
+      }
+      if (password.length < 4) {
+        error.textContent = "Wachtwoord moet minimaal 4 tekens bevatten.";
+        return;
+      }
+
+      const ref = doc(db, "users", name);
+      const existing = await getDoc(ref);
+      if (existing.exists()) {
+        error.textContent = "Deze naam is al geregistreerd.";
+        return;
+      }
+
+      await setDoc(ref, {
+        name: name,
+        teamname: teamname,
+        passwordHash: await sha256(password),
+        createdAt: new Date().toISOString()
+      });
+      currentUser = { name: name, teamname: teamname };
+      isOrganizer = false;
+      enterApp();
     }
-    function hideLoginError() { document.getElementById("loginError").classList.add("hidden"); }
+
+    function logout() {
+      currentUser = null;
+      isOrganizer = false;
+      myTeam = { riders: [], captain: null };
+      document.getElementById("authSection").classList.remove("hidden");
+      document.getElementById("appSection").classList.add("hidden");
+    }
+
+    async function enterApp() {
+      document.getElementById("authSection").classList.add("hidden");
+      document.getElementById("appSection").classList.remove("hidden");
+      document.getElementById("userDisplay").textContent = "Ingelogd als: " + currentUser.name;
+      document.getElementById("tab-uitslag").classList.toggle("hidden", !isOrganizer);
+      updateDeadlineBanner();
+      setInterval(updateDeadlineBanner, 60000);
+
+      if (!isOrganizer) {
+        const teamSnap = await getDoc(doc(db, "teams", currentUser.name));
+        if (teamSnap.exists()) {
+          const t = teamSnap.data();
+          myTeam = { riders: t.riders || [], captain: t.captain || null };
+        }
+      }
+      updateSummary();
+      renderRiders();
+      renderTeam();
+      listenParticipants();
+      listenResults();
+    }
+
+    function showAuth(mode) {
+      document.querySelectorAll("#authSection .tab").forEach(t => t.classList.remove("active"));
+      event.target.classList.add("active");
+      document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
+      document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
+    }
+
+    function showTab(id) {
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+      document.querySelectorAll("#mainTabs .tab").forEach(t => t.classList.remove("active"));
+      document.getElementById(id).classList.remove("hidden");
+      document.getElementById("tab-" + id).classList.add("active");
+      if (id === "deelnemers") renderParticipants();
+      if (id === "uitslag") renderResultForm();
+      if (id === "stand") renderStandings();
+    }
+
+    function listenParticipants() {
+      onSnapshot(collection(db, "teams"), snap => {
+        allUsers = snap.docs.map(d => d.data());
+        if (!document.getElementById("deelnemers").classList.contains("hidden")) renderParticipants();
+        if (!document.getElementById("stand").classList.contains("hidden")) renderStandings();
+      });
+    }
+
+    function listenResults() {
+      onSnapshot(doc(db, "config", "results"), snap => {
+        if (snap.exists()) {
+          results = snap.data().results || {};
+        } else {
+          results = {};
+        }
+        if (!document.getElementById("uitslag").classList.contains("hidden")) renderResultForm();
+        if (!document.getElementById("stand").classList.contains("hidden")) renderStandings();
+      });
+    }
 
     function renderParticipants() {
-      const list = document.getElementById("participantsList");
-      const teams = Object.values(allTeams).sort((a, b) => a.teamName.localeCompare(b.teamName));
-      if (teams.length === 0) {
-        list.innerHTML = "<p class='small'>Nog geen teams ingediend.</p>";
+      const container = document.getElementById("participantsList");
+      if (allUsers.length === 0) {
+        container.innerHTML = "<p class='small'>Nog geen deelnemers.</p>";
         return;
       }
-      list.innerHTML = "";
-      teams.forEach(t => {
-        const teamId = slugify(t.teamName);
-        const spent = t.riders.reduce((sum, name) => sum + getRider(name).price, 0);
-        const captain = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
-        const safeTeamName = t.teamName.replace(/'/g, "\\'");
-        const isOrganizer = currentUser && currentUser.role === "organizer";
-        const div = document.createElement("div");
-        div.className = "team-list-item";
-        div.id = "team-item-" + teamId;
-        div.onclick = () => toggleTeamDetail(teamId);
-        div.innerHTML = `
-          <div class="team-list-header">
-            <div>
-              <strong>${t.teamName}</strong>
-              <div class="small">${t.riders.length} renners &bull; €${spent.toFixed(1)}m &bull; Kapitein: ${captain}</div>
-            </div>
-            <div class="team-list-actions">
-              ${isOrganizer ? `<button class="danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteTeam('${safeTeamName}')">Verwijder</button>` : ""}
-              <div class="team-list-toggle" id="toggle-${teamId}">Toon team ▼</div>
-            </div>
-          </div>
-          <div class="team-detail-content hidden" id="detail-${teamId}" onclick="event.stopPropagation()"></div>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    window.toggleTeamDetail = function(teamId) {
-      const detail = document.getElementById("detail-" + teamId);
-      const toggle = document.getElementById("toggle-" + teamId);
-      const item = document.getElementById("team-item-" + teamId);
-      const isHidden = detail.classList.contains("hidden");
-      document.querySelectorAll(".team-detail-content").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".team-list-toggle").forEach(el => el.textContent = "Toon team ▼");
-      document.querySelectorAll(".team-list-item").forEach(el => el.classList.remove("expanded"));
-      if (isHidden) {
-        detail.classList.remove("hidden");
-        toggle.textContent = "Verberg team ▲";
-        item.classList.add("expanded");
-        renderTeamDetail(teamId);
-      }
-    };
-
-    function renderTeamDetail(teamId) {
-      const detail = document.getElementById("detail-" + teamId);
-      const team = Object.values(allTeams).find(t => slugify(t.teamName) === teamId);
-      if (!team) return;
-
-      const spent = team.riders.reduce((sum, name) => sum + getRider(name).price, 0);
-      let html = `<table class="team-detail-table"><thead><tr><th>#</th><th>Renner</th><th>Land</th><th>Prijs</th></tr></thead><tbody>`;
-      team.riders.forEach((name, idx) => {
-        const rider = getRider(name);
-        const isCaptain = idx === team.captainIndex;
-        html += `<tr class="${isCaptain ? 'captain' : ''}">
-          <td>${idx + 1}</td>
-          <td>${rider.name} ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}</td>
-          <td>${rider.country}</td>
-          <td>€${rider.price.toFixed(1)}m</td>
+      allUsers.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      let html = "<table><tr><th>Deelnemer</th><th>Teamnaam</th><th>Renners</th>" + (isOrganizer ? "<th>Actie</th>" : "") + "</tr>";
+      for (const u of allUsers) {
+        const riderCount = (u.riders || []).length;
+        html += `<tr>
+          <td>${u.name}</td>
+          <td>${u.teamname || ""}</td>
+          <td>${riderCount}/9 ${u.captain ? "(kopman: " + u.captain + ")" : ""}</td>
+          ${isOrganizer ? `<td><button class="danger" onclick="deleteTeam('${u.name}')">Verwijder</button></td>` : ""}
         </tr>`;
-      });
-      html += `</tbody></table>`;
-      html += `<div class="team-detail" style="margin-top: 8px;">Totaal besteed: €${spent.toFixed(1)}m</div>`;
-      detail.innerHTML = html;
+      }
+      html += "</table>";
+      container.innerHTML = html;
     }
 
-    window.deleteTeam = async function(teamName) {
-      if (!confirm(`Team "${teamName}" verwijderen?`)) return;
-      const teamId = slugify(teamName);
-      try {
-        await deleteDoc(doc(db, "teams", teamId));
-      } catch (e) {
-        alert("Fout bij verwijderen: " + e.message);
-      }
+    window.deleteTeam = async function(name) {
+      if (!confirm("Team van " + name + " verwijderen?")) return;
+      await deleteDoc(doc(db, "teams", name));
     };
 
-    function renderResultsInputs() {
-      const container = document.getElementById("resultsInputs");
-      container.innerHTML = "";
-      for (let i = 1; i <= 30; i++) {
-        const row = document.createElement("div");
-        row.className = "result-row";
-        const select = document.createElement("select");
-        select.id = "result-" + i;
-        select.disabled = currentUser.role !== "organizer";
-        const empty = document.createElement("option");
-        empty.value = "";
-        empty.textContent = `-- Plaats ${i} --`;
-        select.appendChild(empty);
-        riders.forEach(r => {
-          const opt = document.createElement("option");
-          opt.value = r.name;
-          opt.textContent = `${r.name} (${r.country})`;
-          if (raceResults[i] === r.name) opt.selected = true;
-          select.appendChild(opt);
+    function renderResultForm() {
+      const form = document.getElementById("resultForm");
+      form.innerHTML = "";
+      const sorted = Object.entries(results)
+        .map(([name, data]) => ({ name, ...data }))
+        .sort((a, b) => {
+          if (a.status === "DNF" && b.status !== "DNF") return 1;
+          if (a.status !== "DNF" && b.status === "DNF") return -1;
+          return (a.position || 999) - (b.position || 999);
         });
-        row.innerHTML = `<span>${i}.</span>`;
-        row.appendChild(select);
-        container.appendChild(row);
+      for (const r of sorted) {
+        addResultRow(r.name, r.position, r.status);
       }
+      if (sorted.length === 0) addResultRow();
+    }
+
+    window.addResultRow = function(name = "", position = "", status = "") {
+      const form = document.getElementById("resultForm");
+      const row = document.createElement("div");
+      row.className = "result-row";
+      row.innerHTML = `
+        <input type="number" placeholder="Plaats" class="res-pos" value="${position}" min="1">
+        <select class="res-name">
+          <option value="">Kies renner</option>
+          ${riders.map(r => `<option value="${r.name}" ${r.name === name ? "selected" : ""}>${r.name}</option>`).join("")}
+        </select>
+        <select class="res-status">
+          <option value="finished" ${status !== "DNF" ? "selected" : ""}>Gefinisht</option>
+          <option value="DNF" ${status === "DNF" ? "selected" : ""}>DNF</option>
+        </select>
+        <button class="danger" onclick="this.parentElement.remove()">Verwijder</button>
+      `;
+      form.appendChild(row);
+    };
+
+    window.clearResults = function() {
+      document.getElementById("resultForm").innerHTML = "";
+      document.getElementById("pcsResults").value = "";
+      addResultRow();
+    };
+
+    window.parsePCSResults = function() {
+      const raw = document.getElementById("pcsResults").value;
+      const lines = raw.split(/\r?\n/).filter(l => l.trim());
+      const parsed = [];
+      const unmatched = [];
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        let position = null;
+        let status = "finished";
+        let rest = trimmed;
+
+        const dnfMatch = trimmed.match(/^(DNF|DNS|DSQ|OTL)\s+(.+)$/i);
+        if (dnfMatch) {
+          status = dnfMatch[1].toUpperCase();
+          rest = dnfMatch[2];
+        } else {
+          const posMatch = trimmed.match(/^(\d+)[\.\s]+(.+)$/);
+          if (posMatch) {
+            position = parseInt(posMatch[1], 10);
+            rest = posMatch[2];
+          }
+        }
+
+        const rider = findRiderByPCSLine(rest);
+        if (rider) {
+          parsed.push({ name: rider.name, position: position, status: status });
+        } else {
+          unmatched.push(trimmed);
+        }
+      }
+
+      document.getElementById("resultForm").innerHTML = "";
+      for (const p of parsed) {
+        addResultRow(p.name, p.position || "", p.status);
+      }
+      if (parsed.length === 0) addResultRow();
+
+      const msg = document.getElementById("parseMsg");
+      const err = document.getElementById("parseError");
+      msg.textContent = parsed.length + " renner(s) herkend.";
+      err.textContent = unmatched.length ? "Niet herkend: " + unmatched.join("; ") : "";
+      setTimeout(() => msg.textContent = "", 5000);
+    };
+
+    function findRiderByPCSLine(line) {
+      const cleaned = line
+        .replace(/\d+h\s+\d+'\s+\d+"?/gi, "")
+        .replace(/\+\s*\d+/g, "")
+        .replace(/\b(NED|BEL|FRA|ITA|ESP|DEN|SLO|GBR|AUS|COL|GER|SUI|POR|AUT|NOR|POL|USA|CAN|IRL|LUX|KAZ|ECU|RSA|NZL|SVK|CZE|LAT|EST|LTU|SRB|CRO|BUL|MKD|ERI)\b/gi, "")
+        .replace(/[^a-zA-Z0-9\s\-']/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const words = cleaned.split(" ").filter(w => w.length > 1);
+      for (let len = Math.min(words.length, 5); len >= 2; len--) {
+        for (let i = 0; i <= words.length - len; i++) {
+          const candidate = words.slice(i, i + len).join(" ");
+          const found = findRiderByName(candidate);
+          if (found) return found;
+        }
+      }
+      return null;
     }
 
     window.saveResults = async function() {
-      hideResultsError();
-      hideResultsSuccess();
-      const results = {};
-      const used = new Set();
-      for (let i = 1; i <= 30; i++) {
-        const val = document.getElementById("result-" + i).value;
-        if (val) {
-          if (used.has(val)) {
-            showResultsError(`Renner "${val}" staat meerdere keren in de uitslag.`);
-            return;
-          }
-          used.add(val);
-          results[i] = val;
-        }
+      const rows = document.querySelectorAll("#resultForm .result-row");
+      const newResults = {};
+      for (const row of rows) {
+        const name = row.querySelector(".res-name").value;
+        const pos = row.querySelector(".res-pos").value;
+        const status = row.querySelector(".res-status").value;
+        if (!name) continue;
+        newResults[name] = {
+          position: pos ? parseInt(pos, 10) : null,
+          status: status
+        };
       }
-      try {
-        await setDoc(doc(db, "results", "current"), results);
-        showResultsSuccess("Uitslag opgeslagen!");
-      } catch (e) {
-        showResultsError("Fout bij opslaan: " + e.message);
-      }
+      await setDoc(doc(db, "config", "results"), { results: newResults, updatedAt: new Date().toISOString() });
+      document.getElementById("resultMsg").textContent = "Uitslag opgeslagen!";
+      setTimeout(() => document.getElementById("resultMsg").textContent = "", 3000);
     };
 
-    window.clearResults = async function() {
-      if (!confirm("Uitslag verwijderen?")) return;
-      try {
-        await deleteDoc(doc(db, "results", "current"));
-      } catch (e) {
-        showResultsError("Fout bij verwijderen: " + e.message);
-      }
-    };
-
-    function showResultsError(msg) {
-      const el = document.getElementById("resultsError");
-      el.textContent = msg;
-      el.classList.remove("hidden");
+    function calculateRiderScore(name) {
+      const r = results[name];
+      if (!r) return 0;
+      if (r.status === "DNF" || r.status === "DNS" || r.status === "DSQ" || r.status === "OTL") return 0;
+      if (!r.position || r.position < 1 || r.position > 30) return 0;
+      return CLASSIFICATION_POINTS[r.position] || 0;
     }
-    function hideResultsError() { document.getElementById("resultsError").classList.add("hidden"); }
-    function showResultsSuccess(msg) {
-      const el = document.getElementById("resultsSuccess");
-      el.textContent = msg;
-      el.classList.remove("hidden");
-    }
-    function hideResultsSuccess() { document.getElementById("resultsSuccess").classList.add("hidden"); }
 
-    function calculateTeamScore(team) {
-      const winnerName = raceResults[1];
-      const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
-
+    function calculateTeamScore(teamData) {
       let total = 0;
-      const riderScores = [];
-      team.riders.forEach((name, idx) => {
-        const rider = getRider(name);
-        let score = 0;
-        for (const [place, riderName] of Object.entries(raceResults)) {
-          if (riderName === name) {
-            score = pointsTable[place] || 0;
-            break;
-          }
-        }
-        if (idx === team.captainIndex) score *= 1.5;
+      const winner = Object.entries(results).find(([_, r]) => r.position === 1 && r.status === "finished");
+      const winnerCountry = winner ? riders.find(x => x.name === winner[0])?.country : null;
 
-        let bonus = 0;
-        if (winnerCountry && rider && rider.country === winnerCountry && name !== winnerName) {
-          bonus = COUNTRYMATE_BONUS;
-        }
-        score += bonus;
+      for (const name of teamData.riders || []) {
+        const rider = riders.find(x => x.name === name);
+        if (!rider) continue;
+        let score = calculateRiderScore(name);
+        const isCaptain = teamData.captain === name;
 
+        if (score > 0 && winnerCountry && rider.country === winnerCountry && name !== winner[0]) {
+          score += 10;
+        }
+
+        if (isCaptain) score *= 2;
         total += score;
-        riderScores.push({ name, score, place: getPlace(name), bonus });
-      });
-      return { total: Math.round(total), riderScores };
-    }
-
-    function getPlace(name) {
-      for (const [place, riderName] of Object.entries(raceResults)) {
-        if (riderName === name) return parseInt(place);
       }
-      return 999;
+      return total;
     }
 
     function renderStandings() {
       const container = document.getElementById("standingsContent");
-      const teams = Object.values(allTeams);
-      if (teams.length === 0) {
-        container.innerHTML = "<p class='small'>Nog geen teams ingediend.</p>";
+      if (allUsers.length === 0) {
+        container.innerHTML = "<p class='small'>Nog geen teams.</p>";
         return;
       }
-      if (Object.keys(raceResults).length === 0) {
-        container.innerHTML = "<p class='small'>Nog geen uitslag ingevoerd.</p>";
-        return;
+      const standings = allUsers.map(u => ({
+        name: u.name,
+        teamname: u.teamname || "",
+        score: calculateTeamScore(u)
+      })).sort((a, b) => b.score - a.score);
+
+      let html = "<table><tr><th>#</th><th>Deelnemer</th><th>Team</th><th>Punten</th></tr>";
+      for (let i = 0; i < standings.length; i++) {
+        const s = standings[i];
+        const rankClass = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "";
+        html += `<tr>
+          <td class="${rankClass}">${i + 1}</td>
+          <td>${s.name}</td>
+          <td>${s.teamname}</td>
+          <td><strong>${s.score}</strong></td>
+        </tr>`;
       }
-
-      const scored = teams.map(t => {
-        const calc = calculateTeamScore(t);
-        return { ...t, ...calc };
-      });
-
-      scored.sort((a, b) => {
-        if (b.total !== a.total) return b.total - a.total;
-        const aPlaces = a.riderScores.map(rs => rs.place).sort((x, y) => x - y);
-        const bPlaces = b.riderScores.map(rs => rs.place).sort((x, y) => x - y);
-        for (let i = 0; i < Math.max(aPlaces.length, bPlaces.length); i++) {
-          const ap = aPlaces[i] || 999;
-          const bp = bPlaces[i] || 999;
-          if (ap !== bp) return ap - bp;
-        }
-        return 0;
-      });
-
-      container.innerHTML = "";
-      const table = document.createElement("table");
-      table.innerHTML = `<tr><th>#</th><th>Team</th><th>Punten</th><th>Kapitein</th><th>Details</th></tr>`;
-      scored.forEach((t, idx) => {
-        const captainName = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
-        const details = t.riderScores
-          .sort((a, b) => a.place - b.place)
-          .map(rs => {
-            const placeStr = rs.place <= 30 ? `(${rs.place})` : "";
-            const bonusStr = rs.bonus > 0 ? ` +${rs.bonus}` : "";
-            return `${rs.name} ${placeStr}: ${(rs.score - rs.bonus).toFixed(1)}${bonusStr} = ${rs.score.toFixed(1)}`;
-          })
-          .join(", ");
-        const row = document.createElement("tr");
-        if (idx === 0) row.style.background = "#fffde7";
-        row.innerHTML = `
-          <td>${idx + 1}</td>
-          <td><strong>${t.teamName}</strong></td>
-          <td><strong>${t.total}</strong></td>
-          <td>${captainName}</td>
-          <td class="small">${details}</td>
-        `;
-        table.appendChild(row);
-      });
-      container.appendChild(table);
+      html += "</table>";
+      container.innerHTML = html;
     }
 
-    window.exportData = async function() {
-      const snapshot = await getDocs(collection(db, "teams"));
-      const teams = {};
-      snapshot.forEach(d => teams[d.id] = d.data());
-      const resultsDoc = await getDoc(doc(db, "results", "current"));
-      const data = {
-        teams,
-        results: resultsDoc.exists() ? resultsDoc.data() : {},
-        exportedAt: new Date().toISOString()
-      };
-      const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-      document.getElementById("exportOutput").value = b64;
-    };
+    window.showAuth = showAuth;
+    window.login = login;
+    window.register = register;
+    window.logout = logout;
+    window.showTab = showTab;
+    window.filterCountry = filterCountry;
+    window.toggleRider = toggleRider;
+    window.toggleCaptain = toggleCaptain;
+    window.saveTeam = saveTeam;
+    window.parsePCSResults = parsePCSResults;
+    window.saveResults = saveResults;
+    window.addResultRow = addResultRow;
+    window.clearResults = clearResults;
+    window.deleteTeam = deleteTeam;
 
-    window.importData = async function() {
-      const input = document.getElementById("importInput").value.trim();
-      if (!input) return;
-      try {
-        const json = decodeURIComponent(escape(atob(input)));
-        const data = JSON.parse(json);
-        if (data.teams) {
-          for (const [id, team] of Object.entries(data.teams)) {
-            await setDoc(doc(db, "teams", id), team);
-          }
-        }
-        if (data.results) {
-          await setDoc(doc(db, "results", "current"), data.results);
-        }
-        alert("Import gelukt!");
-        document.getElementById("importInput").value = "";
-      } catch (e) {
-        alert("Fout bij importeren: " + e.message);
-      }
-    };
-
-    window._riders = riders;
+    initRiders();
   </script>
 </body>
 </html>
