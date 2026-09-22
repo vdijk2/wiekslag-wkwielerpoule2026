@@ -30,8 +30,6 @@
     .rider-card:hover { border-color: #1a237e; }
     .rider-card.selected { border-color: #2e7d32; background: #e8f5e9; }
     .rider-card.captain { border-color: #f9a825; background: #fffde7; box-shadow: 0 0 0 2px #f9a825; }
-    .rider-card.locked { cursor: default; opacity: 0.85; }
-    .rider-card.locked:hover { border-color: #ddd; }
     .rider-name { font-weight: 600; }
     .rider-meta { font-size: 0.85rem; color: #555; margin-top: 4px; }
     .country-link { color: #1a237e; text-decoration: underline; cursor: pointer; font-weight: 600; }
@@ -45,4 +43,1181 @@
     .price-btn.active { background: #1a237e; color: white; border-color: #1a237e; }
     .search-hint { font-size: 0.85rem; color: #666; margin-top: 4px; }
     .summary { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-    .summary-box { flex: 1; min-width: 140px; background: #f0f0f0; padding: 12px; border-radius: 6px; text-align
+    .summary-box { flex: 1; min-width: 140px; background: #f0f0f0; padding: 12px; border-radius: 6px; text-align: center; }
+    .summary-box .value { font-size: 1.4rem; font-weight: 700; }
+    .summary-box .label { font-size: 0.8rem; color: #555; }
+    .summary-box.warning { background: #fff3e0; }
+    .summary-box.error { background: #ffebee; }
+    .error { color: #c62828; background: #ffebee; padding: 10px; border-radius: 6px; margin: 10px 0; }
+    .success-msg { color: #2e7d32; background: #e8f5e9; padding: 10px; border-radius: 6px; margin: 10px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+    th { background: #f0f0f0; }
+    .login-box { max-width: 420px; margin: 40px auto; }
+    .login-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .login-tab { flex: 1; padding: 10px; background: #e0e0e0; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; }
+    .login-tab.active { background: #1a237e; color: white; }
+    .team-list-item { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; transition: background 0.15s; }
+    .team-list-item:hover { background: #f9f9f9; }
+    .team-list-item.expanded { background: #f0f4ff; }
+    .team-list-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .team-list-actions { display: flex; gap: 8px; align-items: center; }
+    .team-list-toggle { font-size: 0.85rem; color: #1a237e; font-weight: 600; }
+    .small { font-size: 0.85rem; color: #666; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; background: #1a237e; color: white; margin-left: 6px; }
+    .export-box { width: 100%; min-height: 120px; font-family: monospace; font-size: 0.85rem; }
+    .info { background: #e3f2fd; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+    code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+    .result-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+    .result-row select { flex: 1; }
+    .result-row span { min-width: 30px; font-weight: 600; }
+    .standings-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+    .standings-row.top { background: #fffde7; font-weight: 600; }
+    .team-detail { margin-top: 8px; font-size: 0.85rem; color: #555; width: 100%; }
+    .team-detail-table { width: 100%; margin-top: 12px; font-size: 0.9rem; }
+    .team-detail-table th, .team-detail-table td { padding: 8px; }
+    .team-detail-table tr.captain { background: #fffde7; font-weight: 600; }
+    .team-composition { margin-top: 16px; }
+    .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 8px; }
+    .comp-row.captain { background: #fffde7; }
+    .comp-info { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; flex: 1; }
+    .comp-remove { background: #c62828; padding: 4px 10px; font-size: 0.8rem; }
+    .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
+    .empty-state { color: #666; font-style: italic; padding: 10px 0; }
+    .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Wiekslag WK Wielerpoule 2026</h1>
+    <p>Mannen Elite Wegrit - Montréal - zondag 27 september 2026</p>
+  </header>
+
+  <div class="container">
+    <div id="loginSection" class="card login-box">
+      <div class="login-tabs">
+        <button id="loginTabBtn" class="login-tab active" onclick="setLoginMode('login')">Inloggen</button>
+        <button id="registerTabBtn" class="login-tab" onclick="setLoginMode('register')">Registreren</button>
+      </div>
+
+      <div id="loginForm">
+        <h2>Inloggen</h2>
+        <label for="loginName">Jouw naam</label>
+        <input type="text" id="loginName" placeholder="Bijv. Sjoerd">
+        <label for="loginPassword">Wachtwoord</label>
+        <input type="password" id="loginPassword" placeholder="Jouw wachtwoord">
+        <button onclick="login()" style="margin-top: 12px; width: 100%;">Inloggen</button>
+        <div class="small" style="margin-top: 12px;">Organisator? Vul je naam in en het organisatorwachtwoord.</div>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <h2>Registreren</h2>
+        <label for="registerName">Jouw naam</label>
+        <input type="text" id="registerName" placeholder="Bijv. Sjoerd">
+        <label for="registerPassword">Wachtwoord</label>
+        <input type="password" id="registerPassword" placeholder="Kies een wachtwoord">
+        <label for="registerTeamName">Teamnaam</label>
+        <input type="text" id="registerTeamName" placeholder="Bijv. De Koerskoningen">
+        <button onclick="register()" style="margin-top: 12px; width: 100%;">Registreren en team maken</button>
+      </div>
+
+      <div id="loginError" class="error hidden" style="margin-top: 12px;"></div>
+    </div>
+
+    <div id="appSection" class="hidden">
+      <div class="user-bar">
+        <div>Ingelogd als: <strong id="currentUserName"></strong> <span id="currentUserRole" class="badge"></span></div>
+        <button class="secondary" onclick="logout()">Uitloggen</button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('teams', this)">Mijn team</button>
+        <button class="tab" onclick="showTab('participants', this)">Deelnemers</button>
+        <button class="tab" onclick="showTab('results', this)">Uitslag</button>
+        <button class="tab" onclick="showTab('standings', this)">Stand</button>
+        <button class="tab" onclick="showTab('data', this)">Backup delen</button>
+      </div>
+
+      <div id="teamsTab" class="tab-content">
+        <div class="card">
+          <h2>Stel je team samen</h2>
+          <div class="info">
+            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) krijgt <strong>10 bonuspunten</strong>.
+          </div>
+
+          <div class="summary">
+            <div class="summary-box" id="budgetBox">
+              <div class="value" id="budgetDisplay">90.0</div>
+              <div class="label">Budget over (m)</div>
+            </div>
+            <div class="summary-box">
+              <div class="value" id="countDisplay">0</div>
+              <div class="label">Renners</div>
+            </div>
+            <div class="summary-box">
+              <div class="value" id="captainDisplay">-</div>
+              <div class="label">Kapitein</div>
+            </div>
+          </div>
+
+          <div id="teamComposition" class="team-composition">
+            <h3>Jouw selectie</h3>
+            <div id="teamCompositionList"></div>
+            <div class="comp-total" id="teamCompositionTotal">Totaal besteed: €0,0m</div>
+          </div>
+
+          <div id="teamError" class="error hidden"></div>
+          <div id="teamSuccess" class="success-msg hidden"></div>
+          <label for="teamNameInput">Teamnaam</label>
+          <input type="text" id="teamNameInput" placeholder="Bijv. De Koerskoningen">
+          <button onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
+          <button class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
+        </div>
+
+        <div class="card">
+          <h2>Beschikbare renners</h2>
+          <div class="filters">
+            <div style="flex: 1; min-width: 160px;">
+              <input type="text" id="searchRider" placeholder="Zoek renner..." oninput="renderRiders()">
+              <div class="search-hint">Typ minimaal 3 tekens om te zoeken.</div>
+            </div>
+            <select id="filterCountry" onchange="renderRiders()"><option value="">Alle landen</option></select>
+          </div>
+          <div class="price-filters" id="priceFilters"></div>
+          <div class="grid" id="ridersGrid"></div>
+        </div>
+      </div>
+
+      <div id="participantsTab" class="tab-content hidden">
+        <div class="card">
+          <h2>Ingediende teams</h2>
+          <p class="small">Klik op een team om de volledige selectie te bekijken.</p>
+          <div id="participantsList"></div>
+        </div>
+      </div>
+
+      <div id="resultsTab" class="tab-content hidden">
+        <div class="card">
+          <h2>Uitslag invoeren</h2>
+          <p class="small">Alleen voor de organisator. Vul de top 30 in. Renners buiten de top 30 of niet gefinisht scoren 0 punten.</p>
+          <div id="resultsError" class="error hidden"></div>
+          <div id="resultsSuccess" class="success-msg hidden"></div>
+          <div id="resultsInputs"></div>
+          <button onclick="saveResults()" style="margin-top: 12px;">Uitslag opslaan</button>
+          <button class="danger" onclick="clearResults()" style="margin-top: 12px; margin-left: 8px;">Uitslag verwijderen</button>
+        </div>
+      </div>
+
+      <div id="standingsTab" class="tab-content hidden">
+        <div class="card">
+          <h2>Stand</h2>
+          <div id="standingsContent"></div>
+        </div>
+      </div>
+
+      <div id="dataTab" class="tab-content hidden">
+        <div class="card">
+          <h2>Backup exporteren</h2>
+          <p class="small">Kopieer deze code en bewaar deze op een veilige plek.</p>
+          <textarea id="exportOutput" class="export-box" readonly></textarea>
+          <button onclick="exportData()" style="margin-top: 8px;">Genereer export</button>
+        </div>
+        <div class="card">
+          <h2>Backup importeren</h2>
+          <p class="small">Plak hier een eerder gegenereerde exportcode.</p>
+          <textarea id="importInput" class="export-box"></textarea>
+          <button onclick="importData()" style="margin-top: 8px;">Importeer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuohguVKK3FXN5Og3tdPuHOJ3upUzaQW8",
+      authDomain: "wiekslag-wk-poule.firebaseapp.com",
+      projectId: "wiekslag-wk-poule",
+      storageBucket: "wiekslag-wk-poule.firebasestorage.app",
+      messagingSenderId: "732858975680",
+      appId: "1:732858975680:web:0e6f7f660b88ff3ff5b425"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const ORGANIZER_PASSWORD = "organisator2026";
+    const TOTAL_BUDGET = 90.0;
+    const TEAM_SIZE = 10;
+    const COUNTRYMATE_BONUS = 10;
+
+    const pointsTable = {
+      1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
+      11: 28, 12: 26, 13: 24, 14: 22, 15: 20, 16: 18, 17: 16, 18: 14, 19: 12, 20: 11,
+      21: 10, 22: 9, 23: 8, 24: 7, 25: 6, 26: 5, 27: 4, 28: 3, 29: 2, 30: 1
+    };
+
+    const riders = [
+      { name: "Remco Evenepoel", country: "BEL", price: 20.0 },
+      { name: "Isaac Del Toro", country: "MEX", price: 19.0 },
+      { name: "Paul Seixas", country: "FRA", price: 18.5 },
+      { name: "Mathieu van der Poel", country: "NED", price: 16.0 },
+      { name: "Wout van Aert", country: "BEL", price: 14.5 },
+      { name: "Tom Pidcock", country: "GBR", price: 14.0 },
+      { name: "Giulio Ciccone", country: "ITA", price: 12.5 },
+      { name: "Ben Healy", country: "IRL", price: 11.5 },
+      { name: "Mathias Vacek", country: "CZE", price: 11.5 },
+      { name: "Jhonatan Narvaez", country: "ECU", price: 11.0 },
+      { name: "Brandon McNulty", country: "USA", price: 10.5 },
+      { name: "Quinn Simmons", country: "USA", price: 10.5 },
+      { name: "Giulio Pellizzari", country: "ITA", price: 10.0 },
+      { name: "Mads Pedersen", country: "DEN", price: 10.0 },
+      { name: "Matteo Jorgenson", country: "USA", price: 9.5 },
+      { name: "Richard Carapaz", country: "ECU", price: 9.5 },
+      { name: "Mauro Schmid", country: "SUI", price: 9.0 },
+      { name: "Florian Lipowitz", country: "GER", price: 8.5 },
+      { name: "Juan Ayuso", country: "ESP", price: 8.5 },
+      { name: "Maxim Van Gils", country: "BEL", price: 8.5 },
+      { name: "Christian Scaroni", country: "ITA", price: 8.0 },
+      { name: "Jan Christen", country: "SUI", price: 8.0 },
+      { name: "Adam Yates", country: "GBR", price: 7.5 },
+      { name: "Joao Almeida", country: "POR", price: 7.5 },
+      { name: "Lorenzo Mark Finn", country: "ITA", price: 7.5 },
+      { name: "Primoz Roglic", country: "SLO", price: 7.5 },
+      { name: "Afonso Eulalio", country: "POR", price: 7.0 },
+      { name: "Enric Mas", country: "ESP", price: 7.0 },
+      { name: "Oscar Onley", country: "GBR", price: 7.0 },
+      { name: "Thibau Nys", country: "BEL", price: 7.0 },
+      { name: "Tobias Halland Johannessen", country: "NOR", price: 7.0 },
+      { name: "Toms Skujins", country: "LAT", price: 7.0 },
+      { name: "Felix Gall", country: "AUT", price: 6.5 },
+      { name: "Marc Hirschi", country: "SUI", price: 6.5 },
+      { name: "Michael Matthews", country: "AUS", price: 6.5 },
+      { name: "Mikkel Frolich Honore", country: "DEN", price: 6.5 },
+      { name: "Neilson Powless", country: "USA", price: 6.5 },
+      { name: "Santiago Buitrago", country: "COL", price: 6.5 },
+      { name: "Alberto Bettiol", country: "ITA", price: 6.0 },
+      { name: "Aleksandr Vlasov", country: "AIN", price: 6.0 },
+      { name: "Antonio Morgado", country: "POR", price: 6.0 },
+      { name: "Ben O'Connor", country: "AUS", price: 6.0 },
+      { name: "Michael Storer", country: "AUS", price: 6.0 },
+      { name: "Michael Woods", country: "CAN", price: 6.0 },
+      { name: "Pavel Sivakov", country: "FRA", price: 6.0 },
+      { name: "Alex Baudin", country: "FRA", price: 5.5 },
+      { name: "Andreas Kron", country: "DEN", price: 5.5 },
+      { name: "Attila Valter", country: "HUN", price: 5.5 },
+      { name: "Corbin Strong", country: "NZL", price: 5.5 },
+      { name: "Derek Gee-West", country: "CAN", price: 5.5 },
+      { name: "Jai Hindley", country: "AUS", price: 5.5 },
+      { name: "Matej Mohoric", country: "SLO", price: 5.5 },
+      { name: "Sergio Higuita", country: "COL", price: 5.5 },
+      { name: "Andreas Leknessund", country: "NOR", price: 5.0 },
+      { name: "Felix Engelhardt", country: "GER", price: 5.0 },
+      { name: "Georg Zimmermann", country: "GER", price: 5.0 },
+      { name: "Jefferson Alexander Cepeda", country: "ECU", price: 5.0 },
+      { name: "Jorgen Nordhagen", country: "NOR", price: 5.0 },
+      { name: "Michael Valgren", country: "DEN", price: 5.0 },
+      { name: "Michal Kwiatkowski", country: "POL", price: 5.0 },
+      { name: "Valentin Paret-Peintre", country: "FRA", price: 5.0 },
+      { name: "Anthon Charmig", country: "DEN", price: 4.5 },
+      { name: "Biniam Girmay", country: "ERI", price: 4.5 },
+      { name: "Felix Grossschartner", country: "AUT", price: 4.5 },
+      { name: "Finn Fisher-Black", country: "NZL", price: 4.5 },
+      { name: "Harold Tejada", country: "COL", price: 4.5 },
+      { name: "Igor Arrieta", country: "ESP", price: 4.5 },
+      { name: "Ivan Romeo", country: "ESP", price: 4.5 },
+      { name: "Marco Brenner", country: "GER", price: 4.5 },
+      { name: "Maximilian Schachmann", country: "GER", price: 4.5 },
+      { name: "Orluis Aular", country: "VEN", price: 4.5 },
+      { name: "Quinten Hermans", country: "BEL", price: 4.5 },
+      { name: "Stefan Kung", country: "SUI", price: 4.5 },
+      { name: "Tiesj Benoot", country: "BEL", price: 4.5 },
+      { name: "Victor Langellotti", country: "MON", price: 4.5 },
+      { name: "Alec Segaert", country: "BEL", price: 4.0 },
+      { name: "Bauke Mollema", country: "NED", price: 4.0 },
+      { name: "Carlos Verona", country: "ESP", price: 4.0 },
+      { name: "Darren Rafferty", country: "IRL", price: 4.0 },
+      { name: "Davide Piganzoli", country: "ITA", price: 4.0 },
+      { name: "Fabio Christen", country: "SUI", price: 4.0 },
+      { name: "Fred Wright", country: "GBR", price: 4.0 },
+      { name: "Gal Glivar", country: "SLO", price: 4.0 },
+      { name: "Guillermo Thomas Silva", country: "URU", price: 4.0 },
+      { name: "Kasper Asgreen", country: "DEN", price: 4.0 },
+      { name: "Kevin Vermaerke", country: "USA", price: 4.0 },
+      { name: "Mattia Cattaneo", country: "ITA", price: 4.0 },
+      { name: "Mikkel Bjerg", country: "DEN", price: 4.0 },
+      { name: "Nairo Quintana", country: "COL", price: 4.0 },
+      { name: "Soren Kragh Andersen", country: "DEN", price: 4.0 },
+      { name: "Stefan Bissegger", country: "SUI", price: 4.0 },
+      { name: "Tobias Foss", country: "NOR", price: 4.0 },
+      { name: "Amanuel Ghebreigzabhier", country: "ERI", price: 3.5 },
+      { name: "Artem Shmidt", country: "USA", price: 3.5 },
+      { name: "Ben Oliver", country: "NZL", price: 3.5 },
+      { name: "Brandon Smith Rivera", country: "COL", price: 3.5 },
+      { name: "Bruno Armirail", country: "FRA", price: 3.5 },
+      { name: "Emils Liepins", country: "LAT", price: 3.5 },
+      { name: "Finlay Pickering", country: "GBR", price: 3.5 },
+      { name: "George Bennett", country: "NZL", price: 3.5 },
+      { name: "Gianni Vermeersch", country: "BEL", price: 3.5 },
+      { name: "Henok Mulubrhan", country: "ERI", price: 3.5 },
+      { name: "Hugo Houle", country: "CAN", price: 3.5 },
+      { name: "Jack Haig", country: "AUS", price: 3.5 },
+      { name: "Jakob Soderqvist", country: "SWE", price: 3.5 },
+      { name: "James Shaw", country: "GBR", price: 3.5 },
+      { name: "Jan Tratnik", country: "SLO", price: 3.5 },
+      { name: "Jefferson Alveiro Cepeda", country: "ECU", price: 3.5 },
+      { name: "Jordan Jegat", country: "FRA", price: 3.5 },
+      { name: "Larry Warbasse", country: "USA", price: 3.5 },
+      { name: "Laurence Pithie", country: "NZL", price: 3.5 },
+      { name: "Luka Mezgec", country: "SLO", price: 3.5 },
+      { name: "Madis Mihkels", country: "EST", price: 3.5 },
+      { name: "Mark Donovan", country: "GBR", price: 3.5 },
+      { name: "Matteo Trentin", country: "ITA", price: 3.5 },
+      { name: "Merhawi Kudus", country: "ERI", price: 3.5 },
+      { name: "Michael Leonard", country: "CAN", price: 3.5 },
+      { name: "Natnael Tesfatsion", country: "ERI", price: 3.5 },
+      { name: "Nelson Oliveira", country: "POR", price: 3.5 },
+      { name: "Nicolas Prodhomme", country: "FRA", price: 3.5 },
+      { name: "Patrick Konrad", country: "AUT", price: 3.5 },
+      { name: "Pier-Andre Cote", country: "CAN", price: 3.5 },
+      { name: "Raul Garcia Pierna", country: "ESP", price: 3.5 },
+      { name: "Ryan Mullen", country: "IRL", price: 3.5 },
+      { name: "Sean Quinn", country: "USA", price: 3.5 },
+      { name: "Anders Skaarseth", country: "NOR", price: 3.0 },
+      { name: "Bart Lemmen", country: "NED", price: 3.0 },
+      { name: "Callum Thornley", country: "GBR", price: 3.0 },
+      { name: "Embret Svestad-Bardseng", country: "NOR", price: 3.0 },
+      { name: "Ivo Oliveira", country: "POR", price: 3.0 },
+      { name: "Jakob Omrzel", country: "SLO", price: 3.0 },
+      { name: "Jamie Meehan", country: "IRL", price: 3.0 },
+      { name: "Jordan Labrosse", country: "FRA", price: 3.0 },
+      { name: "Kristians Belohvosciks", country: "LAT", price: 3.0 },
+      { name: "Luke Tuckwell", country: "AUS", price: 3.0 },
+      { name: "Marcel Camprubi", country: "ESP", price: 3.0 },
+      { name: "Markel Beloki", country: "ESP", price: 3.0 },
+      { name: "Martin Svrcek", country: "SVK", price: 3.0 },
+      { name: "Matevz Govekar", country: "SLO", price: 3.0 },
+      { name: "Menno Huising", country: "NED", price: 3.0 },
+      { name: "Nickolas Zukowsky", country: "CAN", price: 3.0 },
+      { name: "Nico Denz", country: "GER", price: 3.0 },
+      { name: "Pavel Novak", country: "CZE", price: 3.0 },
+      { name: "Tim van Dijke", country: "NED", price: 3.0 },
+      { name: "Wilmar Andres Paredes", country: "COL", price: 3.0 },
+      { name: "Andreas Miltiadis", country: "CYP", price: 2.5 },
+      { name: "Anton Kuzmin", country: "KAZ", price: 2.5 },
+      { name: "Arthur Kluckers", country: "LUX", price: 2.5 },
+      { name: "Byron Munton", country: "RSA", price: 2.5 },
+      { name: "Carlos Alfonso Garcia", country: "MEX", price: 2.5 },
+      { name: "Daan Hoole", country: "NED", price: 2.5 },
+      { name: "Daniil Marukhin", country: "KAZ", price: 2.5 },
+      { name: "Eder Frayre", country: "MEX", price: 2.5 },
+      { name: "Eric Antonio Fagundez", country: "URU", price: 2.5 },
+      { name: "Francisco Joel Penuela", country: "VEN", price: 2.5 },
+      { name: "Henrique da Silva Avancini", country: "BRA", price: 2.5 },
+      { name: "Jakub Otruba", country: "CZE", price: 2.5 },
+      { name: "Juan Mardoqueo Vasquez", country: "GUA", price: 2.5 },
+      { name: "Kaden Hopkins", country: "BER", price: 2.5 },
+      { name: "Manuel Rodas", country: "GUA", price: 2.5 },
+      { name: "Mathijs Paasschens", country: "NED", price: 2.5 },
+      { name: "Nadav Raisberg", country: "ISR", price: 2.5 },
+      { name: "Nicholas Narraway", country: "BER", price: 2.5 },
+      { name: "Oussama Abdellah Mimouni", country: "ALG", price: 2.5 },
+      { name: "Pascal Eenkhoorn", country: "NED", price: 2.5 },
+      { name: "Tiago Antunes", country: "POR", price: 2.5 },
+      { name: "Tilen Finkst", country: "SLO", price: 2.5 },
+      { name: "Vicente Rojas", country: "CHI", price: 2.5 },
+      { name: "Alexandre Mayer", country: "MRI", price: 2.0 },
+      { name: "Ali Al Shaikhahmed", country: "KSA", price: 2.0 },
+      { name: "Arno Wallenborn", country: "LUX", price: 2.0 },
+      { name: "Athit Poulard", country: "THA", price: 2.0 },
+      { name: "Christofer Robin Jurado", country: "PAN", price: 2.0 },
+      { name: "Derrick Chavarria", country: "BIZ", price: 2.0 },
+      { name: "Edgar David Cadena", country: "MEX", price: 2.0 },
+      { name: "Fredd Matute", country: "HON", price: 2.0 },
+      { name: "Gil Landim Gomes", country: "GBS", price: 2.0 },
+      { name: "Heorhii Antonenko", country: "UKR", price: 2.0 },
+      { name: "Iustin-Ioan Vaidian", country: "ROU", price: 2.0 },
+      { name: "Jakub Kaczmarek", country: "POL", price: 2.0 },
+      { name: "Jo Hashikawa", country: "JPN", price: 2.0 },
+      { name: "Jose Antonio Escarcega", country: "MEX", price: 2.0 },
+      { name: "Kohath Baron", country: "DMA", price: 2.0 },
+      { name: "Luis Daniel Oses", country: "CRC", price: 2.0 },
+      { name: "Maral-Erdene Batmunkh", country: "MGL", price: 2.0 },
+      { name: "Martins Pluto", country: "LAT", price: 2.0 },
+      { name: "Mateusz Gajdulewicz", country: "POL", price: 2.0 },
+      { name: "Mihajlo Stolic", country: "SRB", price: 2.0 },
+      { name: "Nikiforos Arvanitou", country: "GRE", price: 2.0 },
+      { name: "Piotr Pekala", country: "POL", price: 2.0 },
+      { name: "Samandar Janikulov", country: "UZB", price: 2.0 },
+      { name: "Ulises Alfredo Castillo", country: "MEX", price: 2.0 },
+      { name: "You Li", country: "CHN", price: 2.0 }
+    ];
+
+    let currentUser = null;
+    let selectedRiders = [];
+    let captainIndex = null;
+    let allTeams = {};
+    let raceResults = {};
+    let unsubscribeTeams = null;
+    let unsubscribeResults = null;
+
+    function getRider(name) {
+      return riders.find(r => r.name === name);
+    }
+
+    async function hashPassword(pw) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(pw);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    window.setLoginMode = function(mode) {
+      document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
+      document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
+      document.getElementById("loginTabBtn").classList.toggle("active", mode === "login");
+      document.getElementById("registerTabBtn").classList.toggle("active", mode === "register");
+      hideLoginError();
+    };
+
+    window.login = async function() {
+      hideLoginError();
+      const name = document.getElementById("loginName").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if (!name || !password) {
+        showLoginError("Vul naam en wachtwoord in.");
+        return;
+      }
+
+      if (password === ORGANIZER_PASSWORD) {
+        currentUser = { name, role: "organizer", teamId: null };
+        enterApp();
+        return;
+      }
+
+      const userId = slugify(name);
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (!userDoc.exists()) {
+        showLoginError("Onbekende naam of verkeerd wachtwoord.");
+        return;
+      }
+
+      const userData = userDoc.data();
+      const hash = await hashPassword(password);
+      if (hash !== userData.passwordHash) {
+        showLoginError("Onbekende naam of verkeerd wachtwoord.");
+        return;
+      }
+
+      currentUser = { name, role: "participant", teamId: userData.teamId };
+      enterApp();
+    };
+
+    window.register = async function() {
+      hideLoginError();
+      const name = document.getElementById("registerName").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const teamName = document.getElementById("registerTeamName").value.trim();
+
+      if (!name || !password || !teamName) {
+        showLoginError("Vul alle velden in.");
+        return;
+      }
+      if (password === ORGANIZER_PASSWORD) {
+        showLoginError("Kies een ander wachtwoord.");
+        return;
+      }
+      if (password.length < 4) {
+        showLoginError("Wachtwoord moet minimaal 4 tekens bevatten.");
+        return;
+      }
+
+      const userId = slugify(name);
+      const existingUser = await getDoc(doc(db, "users", userId));
+      if (existingUser.exists()) {
+        showLoginError("Deze naam is al in gebruik. Kies een andere naam of log in.");
+        return;
+      }
+
+      const teamId = slugify(teamName);
+      const existingTeam = await getDoc(doc(db, "teams", teamId));
+      if (existingTeam.exists()) {
+        showLoginError("Deze teamnaam is al in gebruik. Kies een andere teamnaam.");
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+      try {
+        await setDoc(doc(db, "teams", teamId), {
+          teamName,
+          riders: [],
+          captainIndex: null,
+          createdAt: new Date().toISOString(),
+          createdBy: name
+        });
+        await setDoc(doc(db, "users", userId), {
+          name,
+          passwordHash,
+          teamId,
+          createdAt: new Date().toISOString()
+        });
+        currentUser = { name, role: "participant", teamId };
+        enterApp();
+      } catch (e) {
+        showLoginError("Fout bij registreren: " + e.message);
+      }
+    };
+
+    function enterApp() {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("appSection").classList.remove("hidden");
+      document.getElementById("currentUserName").textContent = currentUser.name;
+      document.getElementById("currentUserRole").textContent = currentUser.role === "organizer" ? "Organisator" : "Deelnemer";
+      startListeners();
+      initUI();
+    }
+
+    window.logout = function() {
+      currentUser = null;
+      selectedRiders = [];
+      captainIndex = null;
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("appSection").classList.add("hidden");
+      document.getElementById("loginPassword").value = "";
+      document.getElementById("registerPassword").value = "";
+      if (unsubscribeTeams) unsubscribeTeams();
+      if (unsubscribeResults) unsubscribeResults();
+    };
+
+    function startListeners() {
+      unsubscribeTeams = onSnapshot(collection(db, "teams"), (snapshot) => {
+        allTeams = {};
+        snapshot.forEach(doc => {
+          allTeams[doc.id] = doc.data();
+        });
+        renderParticipants();
+        renderStandings();
+        if (currentUser.role === "participant" && currentUser.teamId && allTeams[currentUser.teamId]) {
+          loadUserTeam();
+        }
+      });
+
+      unsubscribeResults = onSnapshot(doc(db, "results", "current"), (docSnap) => {
+        raceResults = docSnap.exists() ? docSnap.data() : {};
+        renderResultsInputs();
+        renderStandings();
+      });
+    }
+
+    async function initUI() {
+      populateCountryFilter();
+      renderPriceFilters();
+      renderRiders();
+      renderResultsInputs();
+      renderParticipants();
+      renderStandings();
+
+      if (currentUser.role === "participant" && currentUser.teamId) {
+        await loadUserTeam();
+      } else {
+        resetTeamForm();
+      }
+    }
+
+    async function loadUserTeam() {
+      if (!currentUser.teamId) return;
+      const teamDoc = await getDoc(doc(db, "teams", currentUser.teamId));
+      if (!teamDoc.exists()) return;
+      const team = teamDoc.data();
+      document.getElementById("teamNameInput").value = team.teamName || "";
+      selectedRiders = [...(team.riders || [])];
+      captainIndex = team.captainIndex !== undefined ? team.captainIndex : null;
+      updateSummary();
+      renderRiders();
+    }
+
+    function populateCountryFilter() {
+      const countries = [...new Set(riders.map(r => r.country))].sort();
+      const select = document.getElementById("filterCountry");
+      select.innerHTML = '<option value="">Alle landen</option>';
+      countries.forEach(c => {
+        const option = document.createElement("option");
+        option.value = c;
+        option.textContent = c;
+        select.appendChild(option);
+      });
+    }
+
+    function renderPriceFilters() {
+      const prices = [...new Set(riders.map(r => r.price))].sort((a, b) => b - a);
+      const container = document.getElementById("priceFilters");
+      container.innerHTML = `<button class="price-btn active" data-price="" onclick="setPriceFilter(this, '')">Alle prijzen</button>`;
+      prices.forEach(p => {
+        const btn = document.createElement("button");
+        btn.className = "price-btn";
+        btn.dataset.price = p;
+        btn.textContent = `€${p.toFixed(1)}m`;
+        btn.onclick = () => setPriceFilter(btn, p);
+        container.appendChild(btn);
+      });
+    }
+
+    window.showTab = function(tabId, btn) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
+      document.getElementById(tabId + "Tab").classList.remove("hidden");
+      document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (tabId === "participants") renderParticipants();
+      if (tabId === "standings") renderStandings();
+      if (tabId === "results") renderResultsInputs();
+    };
+
+    window.setPriceFilter = function(btn, price) {
+      document.querySelectorAll(".price-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderRiders();
+    };
+
+    window.setCountryFilter = function(country) {
+      const select = document.getElementById("filterCountry");
+      select.value = country;
+      renderRiders();
+    };
+
+    window.resetTeamForm = function() {
+      document.getElementById("teamNameInput").value = "";
+      selectedRiders = [];
+      captainIndex = null;
+      updateSummary();
+      renderRiders();
+      hideTeamError();
+      hideTeamSuccess();
+    };
+
+    window.toggleRider = function(name) {
+      const idx = selectedRiders.indexOf(name);
+      if (idx >= 0) {
+        selectedRiders.splice(idx, 1);
+        if (captainIndex === idx) captainIndex = null;
+        else if (captainIndex !== null && captainIndex > idx) captainIndex--;
+      } else {
+        if (selectedRiders.length >= TEAM_SIZE) {
+          showTeamError("Je mag maximaal 10 renners selecteren.");
+          return;
+        }
+        selectedRiders.push(name);
+      }
+      hideTeamError();
+      updateSummary();
+      renderRiders();
+    };
+
+    window.removeRider = function(name) {
+      const idx = selectedRiders.indexOf(name);
+      if (idx >= 0) {
+        selectedRiders.splice(idx, 1);
+        if (captainIndex === idx) captainIndex = null;
+        else if (captainIndex !== null && captainIndex > idx) captainIndex--;
+      }
+      hideTeamError();
+      updateSummary();
+      renderRiders();
+    };
+
+    window.setCaptain = function(name, event) {
+      if (event) event.stopPropagation();
+      const idx = selectedRiders.indexOf(name);
+      if (idx >= 0) {
+        captainIndex = idx;
+        updateSummary();
+        renderRiders();
+      }
+    };
+
+    function updateSummary() {
+      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
+      const remaining = TOTAL_BUDGET - spent;
+      document.getElementById("budgetDisplay").textContent = remaining.toFixed(1);
+      document.getElementById("countDisplay").textContent = selectedRiders.length;
+      document.getElementById("captainDisplay").textContent = captainIndex !== null ? selectedRiders[captainIndex].split(" ").pop() : "-";
+
+      const budgetBox = document.getElementById("budgetBox");
+      budgetBox.classList.toggle("error", remaining < 0);
+      budgetBox.classList.toggle("warning", remaining >= 0 && remaining < 5);
+
+      renderTeamComposition();
+    }
+
+    function renderTeamComposition() {
+      const list = document.getElementById("teamCompositionList");
+      const totalEl = document.getElementById("teamCompositionTotal");
+      if (selectedRiders.length === 0) {
+        list.innerHTML = "<div class='empty-state'>Nog geen renners geselecteerd.</div>";
+        totalEl.textContent = "Totaal besteed: €0,0m";
+        return;
+      }
+
+      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
+      list.innerHTML = "";
+      selectedRiders.forEach((name, idx) => {
+        const rider = getRider(name);
+        const isCaptain = idx === captainIndex;
+        const row = document.createElement("div");
+        row.className = "comp-row" + (isCaptain ? " captain" : "");
+        row.innerHTML = `
+          <div class="comp-info">
+            <span><strong>${rider.name}</strong></span>
+            <span class="small">${rider.country}</span>
+            <span class="small">€${rider.price.toFixed(1)}m</span>
+            ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}
+          </div>
+          <button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>
+        `;
+        list.appendChild(row);
+      });
+      totalEl.textContent = `Totaal besteed: €${spent.toFixed(1)}m`;
+    }
+
+    window.renderRiders = function() {
+      const searchInput = document.getElementById("searchRider");
+      const search = searchInput.value.toLowerCase().trim();
+      const country = document.getElementById("filterCountry").value;
+      const activePriceBtn = document.querySelector(".price-btn.active");
+      const activePrice = activePriceBtn ? activePriceBtn.dataset.price : "";
+
+      const grid = document.getElementById("ridersGrid");
+      grid.innerHTML = "";
+
+      if (search.length > 0 && search.length < 3) {
+        grid.innerHTML = "<p class='small'>Typ minimaal 3 tekens om te zoeken.</p>";
+        return;
+      }
+
+      let filtered = riders.filter(r => {
+        const matchesSearch = search === "" || r.name.toLowerCase().includes(search);
+        const matchesCountry = country === "" || r.country === country;
+        const matchesPrice = activePrice === "" || r.price === parseFloat(activePrice);
+        return matchesSearch && matchesCountry && matchesPrice;
+      });
+
+      filtered.sort((a, b) => b.price - a.price || a.name.localeCompare(b.name));
+
+      if (filtered.length === 0) {
+        grid.innerHTML = "<p class='small'>Geen renners gevonden.</p>";
+        return;
+      }
+
+      filtered.forEach(r => {
+        const isSelected = selectedRiders.includes(r.name);
+        const isCaptain = selectedRiders.indexOf(r.name) === captainIndex;
+        const card = document.createElement("div");
+        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "");
+        card.onclick = () => window.toggleRider(r.name);
+        const safeName = r.name.replace(/'/g, "\\'");
+        card.innerHTML = `
+          <div class="rider-name">${r.name}</div>
+          <div class="rider-meta">
+            <span class="country-link" onclick="event.stopPropagation(); setCountryFilter('${r.country}')">${r.country}</span>
+            &bull; €${r.price.toFixed(1)}m
+          </div>
+          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
+        `;
+        grid.appendChild(card);
+      });
+    };
+
+    function validateTeam() {
+      const errors = [];
+      if (selectedRiders.length !== TEAM_SIZE) errors.push(`Selecteer precies ${TEAM_SIZE} renners.`);
+      const spent = selectedRiders.reduce((sum, name) => sum + getRider(name).price, 0);
+      if (spent > TOTAL_BUDGET) errors.push(`Budget overschreden: €${spent.toFixed(1)}m van €${TOTAL_BUDGET.toFixed(1)}m.`);
+      if (captainIndex === null) errors.push("Wijs 1 kapitein aan.");
+      const counts = {};
+      selectedRiders.forEach(name => {
+        const c = getRider(name).country;
+        counts[c] = (counts[c] || 0) + 1;
+      });
+      for (const [c, n] of Object.entries(counts)) {
+        if (n > 2) errors.push(`Meer dan 2 renners uit ${c}.`);
+      }
+      return errors;
+    }
+
+    window.saveTeam = async function() {
+      hideTeamError();
+      hideTeamSuccess();
+      if (currentUser.role !== "participant" || !currentUser.teamId) {
+        showTeamError("Alleen deelnemers kunnen een team opslaan.");
+        return;
+      }
+      const teamName = document.getElementById("teamNameInput").value.trim();
+      if (!teamName) {
+        showTeamError("Vul een teamnaam in.");
+        return;
+      }
+      const errors = validateTeam();
+      if (errors.length > 0) {
+        showTeamError(errors.join(" "));
+        return;
+      }
+
+      const currentTeam = allTeams[currentUser.teamId];
+      if (currentTeam && slugify(currentTeam.teamName) !== slugify(teamName)) {
+        const newTeamId = slugify(teamName);
+        const existing = await getDoc(doc(db, "teams", newTeamId));
+        if (existing.exists()) {
+          showTeamError("Deze teamnaam is al in gebruik.");
+          return;
+        }
+        try {
+          await setDoc(doc(db, "teams", newTeamId), {
+            teamName,
+            riders: selectedRiders,
+            captainIndex,
+            updatedAt: new Date().toISOString(),
+            updatedBy: currentUser.name,
+            createdAt: currentTeam.createdAt || new Date().toISOString(),
+            createdBy: currentTeam.createdBy || currentUser.name
+          });
+          await deleteDoc(doc(db, "teams", currentUser.teamId));
+          await setDoc(doc(db, "users", slugify(currentUser.name)), { teamId: newTeamId }, { merge: true });
+          currentUser.teamId = newTeamId;
+          showTeamSuccess("Team opgeslagen met nieuwe naam!");
+        } catch (e) {
+          showTeamError("Fout bij opslaan: " + e.message);
+        }
+        return;
+      }
+
+      try {
+        await setDoc(doc(db, "teams", currentUser.teamId), {
+          teamName,
+          riders: selectedRiders,
+          captainIndex,
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUser.name
+        }, { merge: true });
+        showTeamSuccess("Team opgeslagen!");
+      } catch (e) {
+        showTeamError("Fout bij opslaan: " + e.message);
+      }
+    };
+
+    function showTeamError(msg) {
+      const el = document.getElementById("teamError");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideTeamError() { document.getElementById("teamError").classList.add("hidden"); }
+    function showTeamSuccess(msg) {
+      const el = document.getElementById("teamSuccess");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideTeamSuccess() { document.getElementById("teamSuccess").classList.add("hidden"); }
+
+    function showLoginError(msg) {
+      const el = document.getElementById("loginError");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideLoginError() { document.getElementById("loginError").classList.add("hidden"); }
+
+    function renderParticipants() {
+      const list = document.getElementById("participantsList");
+      const teams = Object.values(allTeams).sort((a, b) => a.teamName.localeCompare(b.teamName));
+      if (teams.length === 0) {
+        list.innerHTML = "<p class='small'>Nog geen teams ingediend.</p>";
+        return;
+      }
+      list.innerHTML = "";
+      teams.forEach(t => {
+        const teamId = slugify(t.teamName);
+        const spent = t.riders.reduce((sum, name) => sum + getRider(name).price, 0);
+        const captain = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
+        const safeTeamName = t.teamName.replace(/'/g, "\\'");
+        const isOrganizer = currentUser && currentUser.role === "organizer";
+        const div = document.createElement("div");
+        div.className = "team-list-item";
+        div.id = "team-item-" + teamId;
+        div.onclick = () => toggleTeamDetail(teamId);
+        div.innerHTML = `
+          <div class="team-list-header">
+            <div>
+              <strong>${t.teamName}</strong>
+              <div class="small">${t.riders.length} renners &bull; €${spent.toFixed(1)}m &bull; Kapitein: ${captain}</div>
+            </div>
+            <div class="team-list-actions">
+              ${isOrganizer ? `<button class="danger" style="padding: 4px 10px; font-size: 0.8rem;" onclick="event.stopPropagation(); deleteTeam('${safeTeamName}')">Verwijder</button>` : ""}
+              <div class="team-list-toggle" id="toggle-${teamId}">Toon team ▼</div>
+            </div>
+          </div>
+          <div class="team-detail-content hidden" id="detail-${teamId}" onclick="event.stopPropagation()"></div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    window.toggleTeamDetail = function(teamId) {
+      const detail = document.getElementById("detail-" + teamId);
+      const toggle = document.getElementById("toggle-" + teamId);
+      const item = document.getElementById("team-item-" + teamId);
+      const isHidden = detail.classList.contains("hidden");
+      document.querySelectorAll(".team-detail-content").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".team-list-toggle").forEach(el => el.textContent = "Toon team ▼");
+      document.querySelectorAll(".team-list-item").forEach(el => el.classList.remove("expanded"));
+      if (isHidden) {
+        detail.classList.remove("hidden");
+        toggle.textContent = "Verberg team ▲";
+        item.classList.add("expanded");
+        renderTeamDetail(teamId);
+      }
+    };
+
+    function renderTeamDetail(teamId) {
+      const detail = document.getElementById("detail-" + teamId);
+      const team = Object.values(allTeams).find(t => slugify(t.teamName) === teamId);
+      if (!team) return;
+
+      const spent = team.riders.reduce((sum, name) => sum + getRider(name).price, 0);
+      let html = `<table class="team-detail-table"><thead><tr><th>#</th><th>Renner</th><th>Land</th><th>Prijs</th></tr></thead><tbody>`;
+      team.riders.forEach((name, idx) => {
+        const rider = getRider(name);
+        const isCaptain = idx === team.captainIndex;
+        html += `<tr class="${isCaptain ? 'captain' : ''}">
+          <td>${idx + 1}</td>
+          <td>${rider.name} ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}</td>
+          <td>${rider.country}</td>
+          <td>€${rider.price.toFixed(1)}m</td>
+        </tr>`;
+      });
+      html += `</tbody></table>`;
+      html += `<div class="team-detail" style="margin-top: 8px;">Totaal besteed: €${spent.toFixed(1)}m</div>`;
+      detail.innerHTML = html;
+    }
+
+    window.deleteTeam = async function(teamName) {
+      if (!confirm(`Team "${teamName}" verwijderen?`)) return;
+      const teamId = slugify(teamName);
+      try {
+        await deleteDoc(doc(db, "teams", teamId));
+      } catch (e) {
+        alert("Fout bij verwijderen: " + e.message);
+      }
+    };
+
+    function renderResultsInputs() {
+      const container = document.getElementById("resultsInputs");
+      container.innerHTML = "";
+      for (let i = 1; i <= 30; i++) {
+        const row = document.createElement("div");
+        row.className = "result-row";
+        const select = document.createElement("select");
+        select.id = "result-" + i;
+        select.disabled = currentUser.role !== "organizer";
+        const empty = document.createElement("option");
+        empty.value = "";
+        empty.textContent = `-- Plaats ${i} --`;
+        select.appendChild(empty);
+        riders.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r.name;
+          opt.textContent = `${r.name} (${r.country})`;
+          if (raceResults[i] === r.name) opt.selected = true;
+          select.appendChild(opt);
+        });
+        row.innerHTML = `<span>${i}.</span>`;
+        row.appendChild(select);
+        container.appendChild(row);
+      }
+    }
+
+    window.saveResults = async function() {
+      hideResultsError();
+      hideResultsSuccess();
+      const results = {};
+      const used = new Set();
+      for (let i = 1; i <= 30; i++) {
+        const val = document.getElementById("result-" + i).value;
+        if (val) {
+          if (used.has(val)) {
+            showResultsError(`Renner "${val}" staat meerdere keren in de uitslag.`);
+            return;
+          }
+          used.add(val);
+          results[i] = val;
+        }
+      }
+      try {
+        await setDoc(doc(db, "results", "current"), results);
+        showResultsSuccess("Uitslag opgeslagen!");
+      } catch (e) {
+        showResultsError("Fout bij opslaan: " + e.message);
+      }
+    };
+
+    window.clearResults = async function() {
+      if (!confirm("Uitslag verwijderen?")) return;
+      try {
+        await deleteDoc(doc(db, "results", "current"));
+      } catch (e) {
+        showResultsError("Fout bij verwijderen: " + e.message);
+      }
+    };
+
+    function showResultsError(msg) {
+      const el = document.getElementById("resultsError");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideResultsError() { document.getElementById("resultsError").classList.add("hidden"); }
+    function showResultsSuccess(msg) {
+      const el = document.getElementById("resultsSuccess");
+      el.textContent = msg;
+      el.classList.remove("hidden");
+    }
+    function hideResultsSuccess() { document.getElementById("resultsSuccess").classList.add("hidden"); }
+
+    function calculateTeamScore(team) {
+      const winnerName = raceResults[1];
+      const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
+
+      let total = 0;
+      const riderScores = [];
+      team.riders.forEach((name, idx) => {
+        const rider = getRider(name);
+        let score = 0;
+        for (const [place, riderName] of Object.entries(raceResults)) {
+          if (riderName === name) {
+            score = pointsTable[place] || 0;
+            break;
+          }
+        }
+        if (idx === team.captainIndex) score *= 1.5;
+
+        let bonus = 0;
+        if (winnerCountry && rider && rider.country === winnerCountry && name !== winnerName) {
+          bonus = COUNTRYMATE_BONUS;
+        }
+        score += bonus;
+
+        total += score;
+        riderScores.push({ name, score, place: getPlace(name), bonus });
+      });
+      return { total: Math.round(total), riderScores };
+    }
+
+    function getPlace(name) {
+      for (const [place, riderName] of Object.entries(raceResults)) {
+        if (riderName === name) return parseInt(place);
+      }
+      return 999;
+    }
+
+    function renderStandings() {
+      const container = document.getElementById("standingsContent");
+      const teams = Object.values(allTeams);
+      if (teams.length === 0) {
+        container.innerHTML = "<p class='small'>Nog geen teams ingediend.</p>";
+        return;
+      }
+      if (Object.keys(raceResults).length === 0) {
+        container.innerHTML = "<p class='small'>Nog geen uitslag ingevoerd.</p>";
+        return;
+      }
+
+      const scored = teams.map(t => {
+        const calc = calculateTeamScore(t);
+        return { ...t, ...calc };
+      });
+
+      scored.sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        const aPlaces = a.riderScores.map(rs => rs.place).sort((x, y) => x - y);
+        const bPlaces = b.riderScores.map(rs => rs.place).sort((x, y) => x - y);
+        for (let i = 0; i < Math.max(aPlaces.length, bPlaces.length); i++) {
+          const ap = aPlaces[i] || 999;
+          const bp = bPlaces[i] || 999;
+          if (ap !== bp) return ap - bp;
+        }
+        return 0;
+      });
+
+      container.innerHTML = "";
+      const table = document.createElement("table");
+      table.innerHTML = `<tr><th>#</th><th>Team</th><th>Punten</th><th>Kapitein</th><th>Details</th></tr>`;
+      scored.forEach((t, idx) => {
+        const captainName = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
+        const winnerName = raceResults[1];
+        const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
+        const details = t.riderScores
+          .sort((a, b) => a.place - b.place)
+          .map(rs => {
+            const placeStr = rs.place <= 30 ? `(${rs.place})` : "";
+            const bonusStr = rs.bonus > 0 ? ` +${rs.bonus}` : "";
+            return `${rs.name} ${placeStr}: ${(rs.score - rs.bonus).toFixed(1)}${bonusStr} = ${rs.score.toFixed(1)}`;
+          })
+          .join(", ");
+        const row = document.createElement("tr");
+        if (idx === 0) row.style.background = "#fffde7";
+        row.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${t.teamName}</strong></td>
+          <td><strong>${t.total}</strong></td>
+          <td>${captainName}</td>
+          <td class="small">${details}</td>
+        `;
+        table.appendChild(row);
+      });
+      container.appendChild(table);
+    }
+
+    window.exportData = async function() {
+      const snapshot = await getDocs(collection(db, "teams"));
+      const teams = {};
+      snapshot.forEach(d => teams[d.id] = d.data());
+      const resultsDoc = await getDoc(doc(db, "results", "current"));
+      const data = {
+        teams,
+        results: resultsDoc.exists() ? resultsDoc.data() : {},
+        exportedAt: new Date().toISOString()
+      };
+      const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+      document.getElementById("exportOutput").value = b64;
+    };
+
+    window.importData = async function() {
+      const input = document.getElementById("importInput").value.trim();
+      if (!input) return;
+      try {
+        const json = decodeURIComponent(escape(atob(input)));
+        const data = JSON.parse(json);
+        if (data.teams) {
+          for (const [id, team] of Object.entries(data.teams)) {
+            await setDoc(doc(db, "teams", id), team);
+          }
+        }
+        if (data.results) {
+          await setDoc(doc(db, "results", "current"), data.results);
+        }
+        alert("Import gelukt!");
+        document.getElementById("importInput").value = "";
+      } catch (e) {
+        alert("Fout bij importeren: " + e.message);
+      }
+    };
+
+    window._riders = riders;
+  </script>
+</body>
+</html>
