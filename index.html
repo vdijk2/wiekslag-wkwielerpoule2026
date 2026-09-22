@@ -143,7 +143,7 @@
         <div class="card">
           <h2>Stel je team samen</h2>
           <div class="info">
-            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op.
+            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) krijgt <strong>10 bonuspunten</strong>.
           </div>
 
           <div class="summary">
@@ -252,6 +252,7 @@
     const ORGANIZER_PASSWORD = "organisator2026";
     const TOTAL_BUDGET = 90.0;
     const TEAM_SIZE = 10;
+    const COUNTRYMATE_BONUS = 10;
 
     const pointsTable = {
       1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
@@ -1088,9 +1089,13 @@
     function hideResultsSuccess() { document.getElementById("resultsSuccess").classList.add("hidden"); }
 
     function calculateTeamScore(team) {
+      const winnerName = raceResults[1];
+      const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
+
       let total = 0;
       const riderScores = [];
       team.riders.forEach((name, idx) => {
+        const rider = getRider(name);
         let score = 0;
         for (const [place, riderName] of Object.entries(raceResults)) {
           if (riderName === name) {
@@ -1099,8 +1104,15 @@
           }
         }
         if (idx === team.captainIndex) score *= 1.5;
+
+        let bonus = 0;
+        if (winnerCountry && rider && rider.country === winnerCountry && name !== winnerName) {
+          bonus = COUNTRYMATE_BONUS;
+        }
+        score += bonus;
+
         total += score;
-        riderScores.push({ name, score, place: getPlace(name) });
+        riderScores.push({ name, score, place: getPlace(name), bonus });
       });
       return { total: Math.round(total), riderScores };
     }
@@ -1146,11 +1158,14 @@
       table.innerHTML = `<tr><th>#</th><th>Team</th><th>Punten</th><th>Kapitein</th><th>Details</th></tr>`;
       scored.forEach((t, idx) => {
         const captainName = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
+        const winnerName = raceResults[1];
+        const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
         const details = t.riderScores
           .sort((a, b) => a.place - b.place)
           .map(rs => {
             const placeStr = rs.place <= 30 ? `(${rs.place})` : "";
-            return `${rs.name} ${placeStr}: ${rs.score.toFixed(1)}`;
+            const bonusStr = rs.bonus > 0 ? ` +${rs.bonus}` : "";
+            return `${rs.name} ${placeStr}: ${(rs.score - rs.bonus).toFixed(1)}${bonusStr} = ${rs.score.toFixed(1)}`;
           })
           .join(", ");
         const row = document.createElement("tr");
