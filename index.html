@@ -30,6 +30,7 @@
     .rider-card:hover { border-color: #1a237e; }
     .rider-card.selected { border-color: #2e7d32; background: #e8f5e9; }
     .rider-card.captain { border-color: #f9a825; background: #fffde7; box-shadow: 0 0 0 2px #f9a825; }
+    .rider-card.disabled { opacity: 0.6; cursor: not-allowed; }
     .rider-name { font-weight: 600; }
     .rider-meta { font-size: 0.85rem; color: #555; margin-top: 4px; }
     .country-link { color: #1a237e; text-decoration: underline; cursor: pointer; font-weight: 600; }
@@ -85,6 +86,11 @@
     .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
     .empty-state { color: #666; font-style: italic; padding: 10px 0; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .countdown { background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 16px; }
+    .countdown .time { font-size: 1.6rem; font-weight: 700; color: #e65100; }
+    .countdown .label { font-size: 0.9rem; color: #555; margin-top: 4px; }
+    .countdown.closed { background: #ffebee; border-color: #e57373; }
+    .countdown.closed .time { color: #c62828; }
     @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
   </style>
 </head>
@@ -96,6 +102,11 @@
 
   <div class="container">
     <div id="loginSection" class="card login-box">
+      <div id="loginCountdown" class="countdown">
+        <div class="time" id="loginCountdownTime">--</div>
+        <div class="label" id="loginCountdownLabel">tot de deadline om je team in te dienen</div>
+      </div>
+
       <div class="login-tabs">
         <button id="loginTabBtn" class="login-tab active" onclick="setLoginMode('login')">Inloggen</button>
         <button id="registerTabBtn" class="login-tab" onclick="setLoginMode('register')">Registreren</button>
@@ -131,6 +142,11 @@
         <button class="secondary" onclick="logout()">Uitloggen</button>
       </div>
 
+      <div id="appCountdown" class="countdown">
+        <div class="time" id="appCountdownTime">--</div>
+        <div class="label" id="appCountdownLabel">tot de deadline om je team in te dienen</div>
+      </div>
+
       <div class="tabs">
         <button class="tab active" onclick="showTab('teams', this)">Mijn team</button>
         <button class="tab" onclick="showTab('participants', this)">Deelnemers</button>
@@ -144,6 +160,10 @@
           <h2>Stel je team samen</h2>
           <div class="info">
             Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) krijgt <strong>10 bonuspunten</strong>.
+          </div>
+
+          <div id="deadlineNotice" class="error hidden" style="margin-bottom: 12px;">
+            De deadline is verstreken. Je kunt je team niet meer wijzigen.
           </div>
 
           <div class="summary">
@@ -171,8 +191,8 @@
           <div id="teamSuccess" class="success-msg hidden"></div>
           <label for="teamNameInput">Teamnaam</label>
           <input type="text" id="teamNameInput" placeholder="Bijv. De Koerskoningen">
-          <button onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
-          <button class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
+          <button id="saveTeamBtn" onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
+          <button class="secondary" id="resetTeamBtn" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
         </div>
 
         <div class="card">
@@ -253,6 +273,7 @@
     const TOTAL_BUDGET = 90.0;
     const TEAM_SIZE = 10;
     const COUNTRYMATE_BONUS = 10;
+    const DEADLINE = new Date("2026-09-27T15:00:00+02:00");
 
     const pointsTable = {
       1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
@@ -463,9 +484,89 @@
     let raceResults = {};
     let unsubscribeTeams = null;
     let unsubscribeResults = null;
+    let countdownInterval = null;
 
     function getRider(name) {
       return riders.find(r => r.name === name);
+    }
+
+    function isDeadlinePassed() {
+      return new Date() >= DEADLINE;
+    }
+
+    function canEditTeam() {
+      if (!currentUser) return false;
+      if (currentUser.role === "organizer") return true;
+      return !isDeadlinePassed();
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return "Deadline verstreken";
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+      const parts = [];
+      if (days > 0) parts.push(`${days}d`);
+      if (hours > 0 || days > 0) parts.push(`${hours.toString().padStart(2, "0")}u`);
+      parts.push(`${minutes.toString().padStart(2, "0")}m`);
+      parts.push(`${seconds.toString().padStart(2, "0")}s`);
+      return parts.join(" ");
+    }
+
+    function updateCountdowns() {
+      const now = new Date();
+      const remaining = DEADLINE - now;
+      const text = formatCountdown(remaining);
+
+      const loginTime = document.getElementById("loginCountdownTime");
+      const loginBox = document.getElementById("loginCountdown");
+      const loginLabel = document.getElementById("loginCountdownLabel");
+      if (loginTime) loginTime.textContent = text;
+      if (loginBox) loginBox.classList.toggle("closed", remaining <= 0);
+      if (loginLabel) loginLabel.textContent = remaining <= 0
+        ? "De deadline is verstreken; teams kunnen niet meer worden gewijzigd"
+        : "tot de deadline om je team in te dienen";
+
+      const appTime = document.getElementById("appCountdownTime");
+      const appBox = document.getElementById("appCountdown");
+      const appLabel = document.getElementById("appCountdownLabel");
+      if (appTime) appTime.textContent = text;
+      if (appBox) appBox.classList.toggle("closed", remaining <= 0);
+      if (appLabel) appLabel.textContent = remaining <= 0
+        ? "De deadline is verstreken; teams kunnen niet meer worden gewijzigd"
+        : "tot de deadline om je team in te dienen";
+
+      updateDeadlineUI();
+    }
+
+    function startCountdown() {
+      updateCountdowns();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateCountdowns, 1000);
+    }
+
+    function stopCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+    }
+
+    function updateDeadlineUI() {
+      const deadlineNotice = document.getElementById("deadlineNotice");
+      const saveBtn = document.getElementById("saveTeamBtn");
+      const resetBtn = document.getElementById("resetTeamBtn");
+      const teamNameInput = document.getElementById("teamNameInput");
+
+      if (!currentUser) return;
+
+      const editable = canEditTeam();
+      const passed = isDeadlinePassed();
+
+      if (deadlineNotice) deadlineNotice.classList.toggle("hidden", !passed || currentUser.role === "organizer");
+      if (saveBtn) saveBtn.disabled = !editable;
+      if (resetBtn) resetBtn.disabled = !editable;
+      if (teamNameInput && currentUser.role === "participant") teamNameInput.disabled = passed;
+
+      renderRiders();
     }
 
     async function hashPassword(pw) {
@@ -584,6 +685,7 @@
       document.getElementById("currentUserRole").textContent = currentUser.role === "organizer" ? "Organisator" : "Deelnemer";
       startListeners();
       initUI();
+      startCountdown();
     }
 
     window.logout = function() {
@@ -596,6 +698,8 @@
       document.getElementById("registerPassword").value = "";
       if (unsubscribeTeams) unsubscribeTeams();
       if (unsubscribeResults) unsubscribeResults();
+      stopCountdown();
+      startCountdown();
     };
 
     function startListeners() {
@@ -695,6 +799,7 @@
     };
 
     window.resetTeamForm = function() {
+      if (!canEditTeam()) return;
       document.getElementById("teamNameInput").value = "";
       selectedRiders = [];
       captainIndex = null;
@@ -705,6 +810,10 @@
     };
 
     window.toggleRider = function(name) {
+      if (!canEditTeam()) {
+        showTeamError("De deadline is verstreken. Je kunt je team niet meer wijzigen.");
+        return;
+      }
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         selectedRiders.splice(idx, 1);
@@ -723,6 +832,10 @@
     };
 
     window.removeRider = function(name) {
+      if (!canEditTeam()) {
+        showTeamError("De deadline is verstreken. Je kunt je team niet meer wijzigen.");
+        return;
+      }
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         selectedRiders.splice(idx, 1);
@@ -736,6 +849,10 @@
 
     window.setCaptain = function(name, event) {
       if (event) event.stopPropagation();
+      if (!canEditTeam()) {
+        showTeamError("De deadline is verstreken. Je kunt je team niet meer wijzigen.");
+        return;
+      }
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         captainIndex = idx;
@@ -781,7 +898,7 @@
             <span class="small">€${rider.price.toFixed(1)}m</span>
             ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}
           </div>
-          <button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>
+          <button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')" ${canEditTeam() ? "" : "disabled"}>Verwijder</button>
         `;
         list.appendChild(row);
       });
@@ -817,11 +934,13 @@
         return;
       }
 
+      const editable = canEditTeam();
+
       filtered.forEach(r => {
         const isSelected = selectedRiders.includes(r.name);
         const isCaptain = selectedRiders.indexOf(r.name) === captainIndex;
         const card = document.createElement("div");
-        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "");
+        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "") + (editable ? "" : " disabled");
         card.onclick = () => window.toggleRider(r.name);
         const safeName = r.name.replace(/'/g, "\\'");
         card.innerHTML = `
@@ -830,7 +949,7 @@
             <span class="country-link" onclick="event.stopPropagation(); setCountryFilter('${r.country}')">${r.country}</span>
             &bull; €${r.price.toFixed(1)}m
           </div>
-          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
+          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)" ${editable ? "" : "disabled"}>${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
         `;
         grid.appendChild(card);
       });
@@ -858,6 +977,10 @@
       hideTeamSuccess();
       if (currentUser.role !== "participant" || !currentUser.teamId) {
         showTeamError("Alleen deelnemers kunnen een team opslaan.");
+        return;
+      }
+      if (!canEditTeam()) {
+        showTeamError("De deadline is verstreken. Je kunt je team niet meer opslaan.");
         return;
       }
       const teamName = document.getElementById("teamNameInput").value.trim();
@@ -1158,8 +1281,6 @@
       table.innerHTML = `<tr><th>#</th><th>Team</th><th>Punten</th><th>Kapitein</th><th>Details</th></tr>`;
       scored.forEach((t, idx) => {
         const captainName = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
-        const winnerName = raceResults[1];
-        const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
         const details = t.riderScores
           .sort((a, b) => a.place - b.place)
           .map(rs => {
@@ -1218,6 +1339,8 @@
     };
 
     window._riders = riders;
+
+    startCountdown();
   </script>
 </body>
 </html>
