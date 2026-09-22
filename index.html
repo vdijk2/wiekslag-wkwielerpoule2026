@@ -30,6 +30,8 @@
     .rider-card:hover { border-color: #1a237e; }
     .rider-card.selected { border-color: #2e7d32; background: #e8f5e9; }
     .rider-card.captain { border-color: #f9a825; background: #fffde7; box-shadow: 0 0 0 2px #f9a825; }
+    .rider-card.locked { cursor: default; opacity: 0.85; }
+    .rider-card.locked:hover { border-color: #ddd; }
     .rider-name { font-weight: 600; }
     .rider-meta { font-size: 0.85rem; color: #555; margin-top: 4px; }
     .country-link { color: #1a237e; text-decoration: underline; cursor: pointer; font-weight: 600; }
@@ -85,6 +87,8 @@
     .comp-total { margin-top: 12px; font-weight: 600; text-align: right; }
     .empty-state { color: #666; font-style: italic; padding: 10px 0; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .deadline-banner { background: #fff3e0; border: 1px solid #f9a825; color: #5d4037; padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 500; text-align: center; }
+    .deadline-banner.locked { background: #ffebee; border-color: #c62828; color: #c62828; }
     @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
   </style>
 </head>
@@ -131,6 +135,8 @@
         <button class="secondary" onclick="logout()">Uitloggen</button>
       </div>
 
+      <div id="deadlineBanner" class="deadline-banner hidden"></div>
+
       <div class="tabs">
         <button class="tab active" onclick="showTab('teams', this)">Mijn team</button>
         <button class="tab" onclick="showTab('participants', this)">Deelnemers</button>
@@ -171,8 +177,8 @@
           <div id="teamSuccess" class="success-msg hidden"></div>
           <label for="teamNameInput">Teamnaam</label>
           <input type="text" id="teamNameInput" placeholder="Bijv. De Koerskoningen">
-          <button onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
-          <button class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
+          <button id="saveTeamBtn" onclick="saveTeam()" style="margin-top: 12px;">Team opslaan</button>
+          <button id="resetTeamBtn" class="secondary" onclick="resetTeamForm()" style="margin-top: 12px; margin-left: 8px;">Selectie wissen</button>
         </div>
 
         <div class="card">
@@ -253,6 +259,7 @@
     const TOTAL_BUDGET = 90.0;
     const TEAM_SIZE = 10;
     const COUNTRYMATE_BONUS = 10;
+    const DEADLINE = new Date("2026-09-27T15:00:00+02:00");
 
     const pointsTable = {
       1: 90, 2: 75, 3: 65, 4: 58, 5: 52, 6: 47, 7: 43, 8: 39, 9: 35, 10: 31,
@@ -463,6 +470,7 @@
     let raceResults = {};
     let unsubscribeTeams = null;
     let unsubscribeResults = null;
+    let countdownInterval = null;
 
     function getRider(name) {
       return riders.find(r => r.name === name);
@@ -478,6 +486,54 @@
 
     function slugify(text) {
       return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    function isDeadlinePassed() {
+      return new Date() >= DEADLINE;
+    }
+
+    function isTeamLocked() {
+      return currentUser && currentUser.role !== "organizer" && isDeadlinePassed();
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return "0:00:00";
+      const totalSeconds = Math.floor(ms / 1000);
+      const days = Math.floor(totalSeconds / 86400);
+      const hours = Math.floor((totalSeconds % 86400) / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const hh = hours.toString().padStart(2, "0");
+      const mm = minutes.toString().padStart(2, "0");
+      const ss = seconds.toString().padStart(2, "0");
+      if (days > 0) return `${days}d ${hh}:${mm}:${ss}`;
+      return `${hh}:${mm}:${ss}`;
+    }
+
+    function updateDeadlineBanner() {
+      const banner = document.getElementById("deadlineBanner");
+      if (!banner) return;
+      const diff = DEADLINE - new Date();
+      banner.classList.remove("hidden");
+
+      if (currentUser && currentUser.role === "organizer") {
+        if (diff <= 0) {
+          banner.classList.add("locked");
+          banner.textContent = "Deadline is verstreken. Jij bent organisator, dus beheerfuncties blijven beschikbaar.";
+        } else {
+          banner.classList.remove("locked");
+          banner.textContent = `Deadline: zondag 27 september 2026 15:00 CEST. Nog ${formatCountdown(diff)}.`;
+        }
+        return;
+      }
+
+      if (diff <= 0) {
+        banner.classList.add("locked");
+        banner.textContent = "De deadline is verstreken. Je kunt je team niet meer aanpassen.";
+      } else {
+        banner.classList.remove("locked");
+        banner.textContent = `Deadline: zondag 27 september 2026 15:00 CEST. Nog ${formatCountdown(diff)} om je team aan te passen.`;
+      }
     }
 
     window.setLoginMode = function(mode) {
@@ -532,6 +588,10 @@
         showLoginError("Vul alle velden in.");
         return;
       }
+      if (isDeadlinePassed()) {
+        showLoginError("De deadline is verstreken; registratie is gesloten.");
+        return;
+      }
       if (password === ORGANIZER_PASSWORD) {
         showLoginError("Kies een ander wachtwoord.");
         return;
@@ -582,6 +642,9 @@
       document.getElementById("appSection").classList.remove("hidden");
       document.getElementById("currentUserName").textContent = currentUser.name;
       document.getElementById("currentUserRole").textContent = currentUser.role === "organizer" ? "Organisator" : "Deelnemer";
+      updateDeadlineBanner();
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(updateDeadlineBanner, 1000);
       startListeners();
       initUI();
     }
@@ -594,6 +657,7 @@
       document.getElementById("appSection").classList.add("hidden");
       document.getElementById("loginPassword").value = "";
       document.getElementById("registerPassword").value = "";
+      if (countdownInterval) clearInterval(countdownInterval);
       if (unsubscribeTeams) unsubscribeTeams();
       if (unsubscribeResults) unsubscribeResults();
     };
@@ -694,7 +758,15 @@
       renderRiders();
     };
 
+    function updateLockState() {
+      const locked = isTeamLocked();
+      document.getElementById("teamNameInput").disabled = locked;
+      document.getElementById("saveTeamBtn").disabled = locked;
+      document.getElementById("resetTeamBtn").disabled = locked;
+    }
+
     window.resetTeamForm = function() {
+      if (isTeamLocked()) return;
       document.getElementById("teamNameInput").value = "";
       selectedRiders = [];
       captainIndex = null;
@@ -705,6 +777,7 @@
     };
 
     window.toggleRider = function(name) {
+      if (isTeamLocked()) return;
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         selectedRiders.splice(idx, 1);
@@ -723,6 +796,7 @@
     };
 
     window.removeRider = function(name) {
+      if (isTeamLocked()) return;
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
         selectedRiders.splice(idx, 1);
@@ -735,6 +809,7 @@
     };
 
     window.setCaptain = function(name, event) {
+      if (isTeamLocked()) return;
       if (event) event.stopPropagation();
       const idx = selectedRiders.indexOf(name);
       if (idx >= 0) {
@@ -756,11 +831,13 @@
       budgetBox.classList.toggle("warning", remaining >= 0 && remaining < 5);
 
       renderTeamComposition();
+      updateLockState();
     }
 
     function renderTeamComposition() {
       const list = document.getElementById("teamCompositionList");
       const totalEl = document.getElementById("teamCompositionTotal");
+      const locked = isTeamLocked();
       if (selectedRiders.length === 0) {
         list.innerHTML = "<div class='empty-state'>Nog geen renners geselecteerd.</div>";
         totalEl.textContent = "Totaal besteed: €0,0m";
@@ -781,7 +858,7 @@
             <span class="small">€${rider.price.toFixed(1)}m</span>
             ${isCaptain ? '<span class="badge">Kapitein</span>' : ''}
           </div>
-          <button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>
+          ${!locked ? `<button class="comp-remove" onclick="removeRider('${name.replace(/'/g, "\\'")}')">Verwijder</button>` : ""}
         `;
         list.appendChild(row);
       });
@@ -794,6 +871,7 @@
       const country = document.getElementById("filterCountry").value;
       const activePriceBtn = document.querySelector(".price-btn.active");
       const activePrice = activePriceBtn ? activePriceBtn.dataset.price : "";
+      const locked = isTeamLocked();
 
       const grid = document.getElementById("ridersGrid");
       grid.innerHTML = "";
@@ -821,8 +899,8 @@
         const isSelected = selectedRiders.includes(r.name);
         const isCaptain = selectedRiders.indexOf(r.name) === captainIndex;
         const card = document.createElement("div");
-        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "");
-        card.onclick = () => window.toggleRider(r.name);
+        card.className = "rider-card" + (isSelected ? " selected" : "") + (isCaptain ? " captain" : "") + (locked ? " locked" : "");
+        if (!locked) card.onclick = () => window.toggleRider(r.name);
         const safeName = r.name.replace(/'/g, "\\'");
         card.innerHTML = `
           <div class="rider-name">${r.name}</div>
@@ -830,7 +908,7 @@
             <span class="country-link" onclick="event.stopPropagation(); setCountryFilter('${r.country}')">${r.country}</span>
             &bull; €${r.price.toFixed(1)}m
           </div>
-          ${isSelected ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
+          ${isSelected && !locked ? `<button class="captain-btn" onclick="setCaptain('${safeName}', event)">${isCaptain ? "Kapitein" : "Maak kapitein"}</button>` : ""}
         `;
         grid.appendChild(card);
       });
@@ -856,6 +934,10 @@
     window.saveTeam = async function() {
       hideTeamError();
       hideTeamSuccess();
+      if (isTeamLocked()) {
+        showTeamError("De deadline is verstreken; je kunt je team niet meer aanpassen.");
+        return;
+      }
       if (currentUser.role !== "participant" || !currentUser.teamId) {
         showTeamError("Alleen deelnemers kunnen een team opslaan.");
         return;
@@ -1158,8 +1240,6 @@
       table.innerHTML = `<tr><th>#</th><th>Team</th><th>Punten</th><th>Kapitein</th><th>Details</th></tr>`;
       scored.forEach((t, idx) => {
         const captainName = t.captainIndex !== null ? t.riders[t.captainIndex] : "-";
-        const winnerName = raceResults[1];
-        const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
         const details = t.riderScores
           .sort((a, b) => a.place - b.place)
           .map(rs => {
