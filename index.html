@@ -91,6 +91,8 @@
     .countdown .label { font-size: 0.9rem; color: #555; margin-top: 4px; }
     .countdown.closed { background: #ffebee; border-color: #e57373; }
     .countdown.closed .time { color: #c62828; }
+    .dnf-section { margin-top: 24px; padding-top: 16px; border-top: 2px solid #ddd; }
+    .dnf-section label { font-weight: 600; }
     @media (max-width: 600px) { .summary { flex-direction: column; } .grid { grid-template-columns: 1fr; } .filters input, .filters select { width: 100%; } }
   </style>
 </head>
@@ -159,7 +161,7 @@
         <div class="card">
           <h2>Stel je team samen</h2>
           <div class="info">
-            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) krijgt <strong>10 bonuspunten</strong>.
+            Kies <strong>10 renners</strong>, maximaal <strong>2 per land</strong>, binnen het budget van <strong>€90,0m</strong>. Kies <strong>1 kapitein</strong> die 1,5x punten scoort. Een DNF of klassering buiten de top 30 levert 0 punten op. Elke landgenoot van de winnaar (plaats 1) die finisht krijgt <strong>10 bonuspunten</strong>.
           </div>
 
           <div id="deadlineNotice" class="error hidden" style="margin-bottom: 12px;">
@@ -220,7 +222,7 @@
       <div id="resultsTab" class="tab-content hidden">
         <div class="card">
           <h2>Uitslag invoeren</h2>
-          <p class="small">Alleen voor de organisator. Vul de top 30 in. Renners buiten de top 30 of niet gefinisht scoren 0 punten.</p>
+          <p class="small">Alleen voor de organisator. Vul de top 30 in. Renners buiten de top 30 of niet gefinisht scoren 0 punten. DNF-renners krijgen ook geen landgenotenbonus.</p>
           <div id="resultsError" class="error hidden"></div>
           <div id="resultsSuccess" class="success-msg hidden"></div>
           <div id="resultsInputs"></div>
@@ -1142,12 +1144,14 @@
     function renderResultsInputs() {
       const container = document.getElementById("resultsInputs");
       container.innerHTML = "";
+      const isOrganizer = currentUser && currentUser.role === "organizer";
+
       for (let i = 1; i <= 30; i++) {
         const row = document.createElement("div");
         row.className = "result-row";
         const select = document.createElement("select");
         select.id = "result-" + i;
-        select.disabled = currentUser.role !== "organizer";
+        select.disabled = !isOrganizer;
         const empty = document.createElement("option");
         empty.value = "";
         empty.textContent = `-- Plaats ${i} --`;
@@ -1163,6 +1167,36 @@
         row.appendChild(select);
         container.appendChild(row);
       }
+
+      const dnfSection = document.createElement("div");
+      dnfSection.className = "dnf-section";
+      const dnfLabel = document.createElement("label");
+      dnfLabel.textContent = "DNF (niet gefinisht) - selecteer alle renners die niet finishten:";
+      dnfSection.appendChild(dnfLabel);
+
+      const dnfSelect = document.createElement("select");
+      dnfSelect.id = "result-dnf";
+      dnfSelect.multiple = true;
+      dnfSelect.disabled = !isOrganizer;
+      dnfSelect.style.height = "220px";
+      dnfSelect.style.width = "100%";
+      dnfSelect.style.marginTop = "8px";
+      const dnfList = Array.isArray(raceResults.dnf) ? raceResults.dnf : [];
+      riders.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.name;
+        opt.textContent = `${r.name} (${r.country})`;
+        if (dnfList.includes(r.name)) opt.selected = true;
+        dnfSelect.appendChild(opt);
+      });
+      dnfSection.appendChild(dnfSelect);
+
+      const hint = document.createElement("div");
+      hint.className = "search-hint";
+      hint.textContent = "Houd Ctrl (Windows) of Cmd (Mac) ingedrukt om meerdere renners te selecteren.";
+      dnfSection.appendChild(hint);
+
+      container.appendChild(dnfSection);
     }
 
     window.saveResults = async function() {
@@ -1181,6 +1215,17 @@
           results[i] = val;
         }
       }
+
+      const dnfSelect = document.getElementById("result-dnf");
+      const dnfList = Array.from(dnfSelect.selectedOptions).map(o => o.value);
+      for (const name of dnfList) {
+        if (used.has(name)) {
+          showResultsError(`Renner "${name}" kan niet tegelijk in de top 30 en DNF staan.`);
+          return;
+        }
+      }
+      if (dnfList.length > 0) results.dnf = dnfList;
+
       try {
         await setDoc(doc(db, "results", "current"), results);
         showResultsSuccess("Uitslag opgeslagen!");
@@ -1211,6 +1256,17 @@
     }
     function hideResultsSuccess() { document.getElementById("resultsSuccess").classList.add("hidden"); }
 
+    function getPlace(name) {
+      for (let i = 1; i <= 30; i++) {
+        if (raceResults[i] === name) return i;
+      }
+      return 999;
+    }
+
+    function isDNF(name) {
+      return Array.isArray(raceResults.dnf) && raceResults.dnf.includes(name);
+    }
+
     function calculateTeamScore(team) {
       const winnerName = raceResults[1];
       const winnerCountry = winnerName ? getRider(winnerName)?.country : null;
@@ -1219,32 +1275,20 @@
       const riderScores = [];
       team.riders.forEach((name, idx) => {
         const rider = getRider(name);
-        let score = 0;
-        for (const [place, riderName] of Object.entries(raceResults)) {
-          if (riderName === name) {
-            score = pointsTable[place] || 0;
-            break;
-          }
-        }
+        const place = getPlace(name);
+        let score = place <= 30 ? (pointsTable[place] || 0) : 0;
         if (idx === team.captainIndex) score *= 1.5;
 
         let bonus = 0;
-        if (winnerCountry && rider && rider.country === winnerCountry && name !== winnerName) {
+        if (winnerCountry && rider && rider.country === winnerCountry && name !== winnerName && !isDNF(name)) {
           bonus = COUNTRYMATE_BONUS;
         }
         score += bonus;
 
         total += score;
-        riderScores.push({ name, score, place: getPlace(name), bonus });
+        riderScores.push({ name, score, place, bonus });
       });
       return { total: Math.round(total), riderScores };
-    }
-
-    function getPlace(name) {
-      for (const [place, riderName] of Object.entries(raceResults)) {
-        if (riderName === name) return parseInt(place);
-      }
-      return 999;
     }
 
     function renderStandings() {
@@ -1254,7 +1298,8 @@
         container.innerHTML = "<p class='small'>Nog geen teams ingediend.</p>";
         return;
       }
-      if (Object.keys(raceResults).length === 0) {
+      const hasResults = Object.keys(raceResults).some(k => k !== "dnf");
+      if (!hasResults) {
         container.innerHTML = "<p class='small'>Nog geen uitslag ingevoerd.</p>";
         return;
       }
